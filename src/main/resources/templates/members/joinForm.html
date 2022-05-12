@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>미니 프로젝트</title>
+	<style>
+		.container {
+			max-width: 560px;
+		}
+		.field-error {
+			border-color: #dc3545;
+			color: #dc3545;
+		}
+	</style>
+
+<!-- Bootstrap CDN -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	//id 중복처리.
+	function checkUserId(){
+		var userId = $("#userId").val()
+
+		if(userId.length == 0 || userId.length < 8|| userId >20 || userId == ""){
+			alert('영문과 숫자를 이용하여 8~20글자로 입력해주세요.')
+			return
+		}
+
+		$.ajax({
+			url : '/members/checkUserId/' + userId,
+			type : 'get',
+			dataType : 'text',
+			success : function (result){
+				if(result.trim() == 'true'){
+					alert('사용 가능한 아이디 입니다.')
+					$("#checkDoubleId").val(true)
+				}else{
+					alert('이미 사용중인 아이디 입니다.')
+					$("#checkDoubleId").val(false)
+				}
+			}
+		})
+	}
+	//id값이 변경되면 다시 중복처리하게끔 유도.
+	function resetUserId(){
+		$("#checkDoubleId").val(false)
+	}
+
+	var code2 = "";
+
+	//휴대전화 메세지 전송
+	function sendMessage(){
+		var tel = $("#tel").val();
+
+		if(tel.length == 0){
+			alert('전화번호를 입력해주세요.')
+			return
+		}
+
+
+
+
+		$.ajax({
+			url : '/certification/phone/' + tel,
+			type : 'post',
+			dataType : 'text',
+			success : function (data){
+				if(data == "error"){
+					alert('올바른 전화번호 형식을 입력해주세요.')
+				}else{
+					alert('전송되었습니다.')
+					$("#certification").attr("readOnly",false);
+					$("#certification").attr("required",true);
+					$("#tel").attr("readOnly" , true);
+					code2 = data;
+				}
+			}
+		})
+
+	}
+	function resetTel(){
+		$("#successChk").text("미인증");
+		$("#checkPhone").val(false);
+	}
+
+	//메세지 인증
+	function messageCertification(){
+		var certification = $("#certification").val();
+
+		if(certification.length != 4){
+			alert('올바른 인증번호를 입력해주세요.')
+			return
+		}
+
+		if(certification == code2){
+			alert('인증되었습니다');
+			$("#successChk").text("인증완료");
+			$("#checkPhone").val(true);
+			$("#certification").attr("readOnly",true);
+			$("#certificationButton").attr("disabled",true);
+			$("#sendMessages").attr("disabled",true);
+		}else{
+			alert('잘못된 인증번호 입니다.');
+		}
+
+	}
+
+
+</script>
+
+</head>
+<body>
+
+<nav th:replace="~{/template/fragment/menu :: menu}"></nav>
+
+
+
+<div class="container" style="margin-top:100px">
+	<div class="row">
+		<div class="col-sm-3"></div>
+		<div class="col-sm-6">
+			<div class="card shadow">
+				<div class="card-body">
+					<form action="../login/login.html" th:action="@{/members/join}" method="post" th:object="${joinMemberDTO}">
+						<div class="form-group">
+							<label for="username">이름</label>
+							<input type="text" id="username" th:field="*{username}" class="form-control"
+								   th:errorclass="field-error" placeholder="닉네임을 입력 하세요.">
+							<div class="field-error" th:errors="*{username}">
+								이름 오류
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="userId">아이디</label>
+							<div class="input-group">
+								<input type="text" id="userId" th:field="*{userId}" class="form-control" th:onchange="|javascript:resetUserId()|"
+									   th:errorclass="field-error" placeholder="영문과 숫자로만 구성해주세요."/>
+								<div class="input-group-append">
+									<button type="button" class="btn btn-primary" th:onclick="|javascript:checkUserId()|">중복확인</button>
+									<input type="hidden" th:field="*{checkDoubleId}" id="checkDoubleId">
+								</div>
+							</div>
+							<div class="field-error" th:errors="*{userId}">
+								아이디 오류
+							</div>
+							<div class="field-error" th:errors="*{checkDoubleId}">
+								중복확인 오류
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password">비밀번호</label>
+							<input type="password" id="password" th:field="*{password}" class="form-control"
+								   th:errorclass="field-error" placeholder="영문자,숫자,특수문자를 1글자 이상씩 조합하여 8~16내로 작성해주세요."/>
+							<div class="field-error" th:errors="*{password}">
+								비밀번호 오류
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password2">비밀번호 확인</label>
+							<input type="password" id="password2" th:field="*{password2}" class="form-control"/>
+						</div>
+						<div class="form-group">
+							<label for="email">이메일</label>
+							<input type="email" id="email" th:field="*{email}" class="form-control" placeholder="ex) email@naver.com"
+								   th:errorclass="field-error"/>
+							<div class="field-error" th:errors="*{email}">
+								이메일 오류
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="tel">휴대폰 번호</label>
+							<div class="input-group">
+							<input type="tel" id="tel"  th:field="*{tel}" class="form-control" placeholder="ex) xxx-xxxx-xxxx" th:errorclass="field-error" th:onchange="|javascript:resetTel()|" />
+								<div class="input-group-append">
+								<button type="button" class="btn btn-primary" id="sendMessages" th:onclick="|javascript:sendMessage()|">인증번호 전송</button>
+								</div>
+							</div>
+							<div class="field-error" th:errors="*{tel}">
+								전화번호 오류
+							</div>
+							<div class="field-error" th:errors="*{checkPhone}">
+								전화번호 인증 오류
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="certification">인증 번호</label>
+							<div class="input-group">
+							<input id="certification" type="text"   th:readonly="true"/>
+							<div class="input-group-append">
+								<button type="button" class="btn btn-primary" id="certificationButton" th:onclick="|javascript:messageCertification()|">인증</button>
+								<input type="hidden" id="checkPhone" th:field="*{checkPhone}"/>
+							</div>
+							</div>
+							<span id="successChk"></span>
+						</div>
+
+						<div class="form-group">
+							<label th:field="*{knownRoot}">알게된 경로</label>
+							<select name="knownRoot" id="knownRoot" class="form-control">
+								<option value="">==경로 선택==</option>
+								<option th:value="blog">블로그</option>
+								<option th:value="surfing">서핑</option>
+								<option th:value="recommendation">추천</option>
+								<option th:value="etc">기타</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<div class="text-right">
+								<input th:type="submit" class="btn btn-primary" th:value="회원가입">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-3"></div>
+	</div>
+</div>
+
+
+<div th:replace="~{/template/fragment/bottom :: bottom}"></div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
