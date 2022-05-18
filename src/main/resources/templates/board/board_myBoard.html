@@ -12,38 +12,6 @@
 <body>
 <!--상단 메뉴-->
 <nav th:replace="~{/template/fragment/menu :: menu}"></nav>
-<!--
-<div class="container" style="margin-top: 100px;">
-	<div class="card">
-		<div class="card-header bg-secondary">
-			<h4 class="card-title font-weight-bold text-center ">공지사항</h4>
-		</div>
-		<div class="card-body">
-			<table class="table table-hover table-success">
-				<thead>
-				<tr>
-				<th class="text-center d-none d-md-table-cell">글번호</th>
-				<th class="w-50">제목</th>
-				<th class="text-center d-none d-md-table-cell">작성자</th>
-				<th class="text-center d-none d-md-table-cell">조회수</th>
-				<th class="text-center d-none d-md-table-cell">추천수</th>
-				<th class="text-center d-none d-md-table-cell">작성날짜</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-					<th class="text-center d-none d-md-table-cell">글번호</th>
-					<th class="w-50">제목</th>
-					<th class="text-center d-none d-md-table-cell">작성자</th>
-					<th class="text-center d-none d-md-table-cell">조회수</th>
-					<th class="text-center d-none d-md-table-cell">추천수</th>
-					<th class="text-center d-none d-md-table-cell">작성날짜</th>
-				</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>-->
 
 
 <!-- 게시글 리스트 -->
@@ -62,10 +30,10 @@
 					</tr>
 				</thead>
 				<tbody>
-					<div th:if="${allBoard.size()==0}">
+					<div th:if="${allMyBoard.size()==0}">
 						<h4 class="font-italic">등록된 게시글이 없습니다.</h4>
 					</div>
-					<div th:if="${allBoard.size()!=0 }" th:each="board : ${allBoard}">
+					<div th:if="${allMyBoard.size()!=0 }" th:each="board : ${allMyBoard}">
 					<tr>
 						<td class="text-center d-none d-md-table-cell" th:text="${board.id}">게시글아이디</td>
 						<td><a href='board_read.html' th:href="@{/board/read/{boardId}/{memberId}(boardId=${board.id} , memberId=${board.memberId})}" th:text="${board.subject}">제목</a></td>

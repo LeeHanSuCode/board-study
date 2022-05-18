@@ -4,11 +4,8 @@ import board.boardstudy.entity.mappedEntity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
-import javax.validation.constraints.Null;
-import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +51,7 @@ public class Board extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "board")
-    private List<BoardComment> boardComments = new ArrayList<>();
+    private List<Comments> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "board")
     private List<FileStore> fileStores = new ArrayList<>();

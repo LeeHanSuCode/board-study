@@ -1,4 +1,4 @@
-package board.boardstudy.dto;
+package board.boardstudy.dto.members;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 //2.entity를 노출시키지 않기 위해.
 
 @Setter @Getter
-public class JoinMemberDTO {
+public class MemberJoinDTO {
 
 
     @NotBlank

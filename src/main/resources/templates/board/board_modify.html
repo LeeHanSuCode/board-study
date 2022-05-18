@@ -18,12 +18,25 @@
 
 	</style>
 
-
 	<!-- Bootstrap CDN -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+
+	<script th:inline="javascript" type="text/javascript">
+		let boardId = [[${boardUpdateDTO.id}]];
+
+
+
+		function removeFile(id){
+			$("#remove" + id ).attr("disabled",true);
+			$('#' + id).attr("disabled",true);
+		}
+
+
+	</script>
 
 
 </head>
@@ -38,14 +51,10 @@
 		<div class="col-sm-6">
 			<div class="card shadow">
 				<div class="card-body">
-					<form th:action th:object="${boardReadDTO}" method="post">
+					<form th:action th:object="${boardUpdateDTO}" method="post" enctype="multipart/form-data">
 						<div class="form-group">
 							<label for="writer">작성자</label>
 							<input type="text" id="writer" th:field="*{writer}" class="form-control"  th:readonly="true"/>
-						</div>
-						<div class="form-group">
-							<label for="createdDate">작성날짜</label>
-							<input type="text" id="createdDate" th:field="*{createdDate}" class="form-control"  th:readonly="true"/>
 						</div>
 						<div class="form-group">
 							<label for="subject">제목</label>
@@ -56,26 +65,28 @@
 						</div>
 						<div class="form-group">
 							<label for="boardContent">내용</label>
-							<textarea id="boardContent" th:field="*{boardContent}" class="form-control" rows="10" style="resize:none" th:errorclass="field-error">본문입니다</textarea>
-							<div class="field-error" th:errors="*{boardContent}">
+							<textarea id="boardContent" th:field="*{content}" class="form-control" rows="10" style="resize:none" th:errorclass="field-error">본문입니다</textarea>
+							<div class="field-error" th:errors="*{content}">
 								내용오류
 							</div>
 						</div>
-					<!--	<div class="form-group">
+						<div class="form-group">
 							<label for="files">첨부 파일</label>
 							<input type="file" id="files" name="files" multiple="multiple" class="form-control" accept="image/*"/>
 						</div>
 						<div class="form-group">
-							<div th:if="${files.size()!=0}">
-								<div th:each="file : ${files}">첨부파일 : <a th:href="|/board/download/${file.uploadFilename}/${file.serverFilename}|"
-																		 th:text="${file.uploadFilename}"></a>
-									<span class="btn btn-danger" th:id="${file.id}" th:onclick="|javascript:removeFile('${file.id}')|">X</span> </div>
+							<div>
+								<div th:if="${fileDTO.size() > 0}" th:each="file : ${fileDTO}">
+									<div>첨부파일<a th:href="|/file/download/${file.uploadFilename}/${file.serverFilename}|" th:text="${file.uploadFilename}">파일이름</a>
+										<input type="hidden" th:id="${file.id}" name="removeFiles" th:value="${file.id}">
+										<button class="btn btn-danger" th:id="|remove${file.id}|" th:onclick="|javascript:removeFile(${file.id})|">X</button></div>
+								</div>
 							</div>
-						</div>-->
+						</div>
 						<div class="form-group">
 							<div class="text-right">
 								<button type="submit"  class="btn btn-primary">수정완료</button>
-								<a href="board_read.html" th:href="@{/board/read/{boardId}(boardId=*{id})}" class="btn btn-info">취소</a>
+								<a href="board_read.html" th:href="@{/board/read/{boardId}/{memberId}(boardId=${boardUpdateDTO.id} ,memberId=${session.loginMember.id})}" class="btn btn-info">취소</a>
 							</div>
 						</div>
 					</form>

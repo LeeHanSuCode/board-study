@@ -1,18 +1,20 @@
 package board.boardstudy.service;
 
 import board.boardstudy.dto.LoginDTO;
+import board.boardstudy.dto.members.MemberUpdateDTO;
 import board.boardstudy.entity.Member;
 import board.boardstudy.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
     
     private final MemberRepository memberRepository;
@@ -87,6 +89,8 @@ public class MemberService {
     public String checkUserId(String userId){
         List<Member> findByUserId = memberRepository.findByUserId(userId);
 
+        log.info("size = {}" , findByUserId.size());
+
         if(findByUserId.size()==0) return "true";
 
         return "false";
@@ -102,5 +106,18 @@ public class MemberService {
 
 
 
+    @Transactional
+    public Long updateMember(Long id , MemberUpdateDTO updateMemberDTO){
+        Member findMember = memberRepository.findById(id);
+
+        findMember.changeMemberInfo(updateMemberDTO.getPassword(),updateMemberDTO.getEmail(),updateMemberDTO.getTel());
+
+        return findMember.getId();
+    }
+
+    @Transactional
+    public void removeMember(Long id){
+        memberRepository.removeMember(id);
+    }
     
 }

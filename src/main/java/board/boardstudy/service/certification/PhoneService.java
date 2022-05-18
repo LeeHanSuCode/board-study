@@ -11,8 +11,8 @@ import java.util.HashMap;
 public class PhoneService {
 
     public void joinCertification(String tel ,String numStr){
-        String api_key = "api키";
-        String api_secret = "api_secret 키";
+        String api_key = "api";
+        String api_secret = "api_secret";
 
 
         Message coolsms = new Message(api_key,api_secret);

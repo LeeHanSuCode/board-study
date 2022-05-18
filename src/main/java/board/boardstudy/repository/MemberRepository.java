@@ -26,7 +26,7 @@ public class MemberRepository {
 
     //회원 단건 조회(db id)
     public Member findById(Long id){
-       return em.find(Member.class, id);
+        return em.find(Member.class, id);
     }
 
     //회원 단건 조회(userId)
@@ -56,7 +56,16 @@ public class MemberRepository {
         return em.createQuery("select m from Member m" , Member.class).getResultList();
     }
 
+    //회원 삭제
+    public Long removeMember(Long id){
+        Member findMember = findById(id);
+        em.remove(findMember);
 
+        //나중에 java 복습하다가 Optional로 감싸서 값을 리턴하는 것으로 리팩토링 할 떄,
+        //해당 id값이 db에 남아있는지 아닌지 확인하는 과정을 처리해 주자.
+
+        return id;
+    }
 
 
 

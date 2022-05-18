@@ -30,7 +30,7 @@
 		<div class="col-sm-6">
 			<div class="card shadow">
 				<div class="card-body">
-					<form action="board_read.html" th:action="@{/board/write/1}" method="post" th:object="${boardWriteDTO}" enctype="multipart/form-data">
+					<form action="board_read.html" th:action="@{/board/write}" method="post" th:object="${boardWriteDTO}" enctype="multipart/form-data">
 					<div class="form-group">
 						<label for="subject">제목</label>
 						<input type="text" id="subject" th:field="*{subject}" class="form-control" th:errorclass="field-error"/>

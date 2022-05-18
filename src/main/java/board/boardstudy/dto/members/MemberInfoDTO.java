@@ -1,4 +1,4 @@
-package board.boardstudy.dto;
+package board.boardstudy.dto.members;
 
 import lombok.Getter;
 import lombok.Setter;

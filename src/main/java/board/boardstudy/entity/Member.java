@@ -1,12 +1,9 @@
 package board.boardstudy.entity;
 
-import board.boardstudy.dto.JoinMemberDTO;
-import board.boardstudy.dto.UpdateMemberDTO;
 import board.boardstudy.entity.mappedEntity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -65,11 +62,19 @@ public class Member extends BaseEntity {
     private List<Board> boardList = new ArrayList<>();
 
 
-
-
     //비밀번호 변경
     public void changePw(String password){
+        this.updatedDate=LocalDateTime.now();
         this.password = password;
+    }
+
+
+    //회원 정보 수정
+    public void changeMemberInfo(String password , String email , String tel){
+        this.email = email;
+        this.tel = tel;
+        this.password = password;
+        this.updatedDate = LocalDateTime.now();
     }
 
 

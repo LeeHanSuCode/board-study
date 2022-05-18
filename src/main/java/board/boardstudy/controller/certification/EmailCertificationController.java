@@ -31,8 +31,7 @@ public class EmailCertificationController {
     @PostMapping("/find/email/{email}/{username}")
     @ResponseBody
     public String findIdMail(@PathVariable String email ,@PathVariable String username){
-        log.info("email={}" , email);
-        log.info("username={}" , username);
+
         //패턴 검증
         if(!matcherEmail(email)){
             return "error";

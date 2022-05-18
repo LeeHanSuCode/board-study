@@ -1,11 +1,10 @@
-package board.boardstudy.dto;
+package board.boardstudy.dto.board;
 
-import board.boardstudy.entity.FileStore;
+import board.boardstudy.dto.CommentReadDTO;
+import board.boardstudy.dto.FileDTO;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.mail.Multipart;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,9 +13,10 @@ import java.util.List;
 @Setter
 public class BoardReadDTO {
 
-    public BoardReadDTO(Long id,String subject , String boardContent , String writer , LocalDateTime createdDate ,
+    public BoardReadDTO(Long boardId , Long memberId , String subject , String boardContent , String writer , LocalDateTime createdDate ,
                         Integer readCount){
-        this.id = id;
+        this.id = boardId;
+        this.memberId = memberId;
         this.subject =subject;
         this.boardContent =boardContent;
         this.writer =writer;
@@ -26,15 +26,17 @@ public class BoardReadDTO {
 
     private Long id;
 
-    @NotBlank
     private String subject;
-    @NotBlank
+
     private String boardContent;
 
     private String writer;
+
+    private Long memberId;
+
     private LocalDateTime createdDate;
 
     private Integer readCount;
 
-    private List<MultipartFile> files;
+
 }

@@ -1,17 +1,20 @@
 package board.boardstudy.controller;
 
 
-import board.boardstudy.dto.BoardReadDTO;
-import board.boardstudy.dto.BoardWriteDTO;
-import board.boardstudy.dto.CommentReadDTO;
-import board.boardstudy.dto.FileDTO;
+import board.boardstudy.argument.Login;
+import board.boardstudy.dto.*;
+import board.boardstudy.dto.board.BoardReadDTO;
+import board.boardstudy.dto.board.BoardUpdateDTO;
+import board.boardstudy.dto.board.BoardWriteDTO;
 import board.boardstudy.entity.Board;
 import board.boardstudy.entity.FileStore;
 import board.boardstudy.file.FileProcess;
 import board.boardstudy.service.BoardService;
+import board.boardstudy.service.FileService;
 import board.boardstudy.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.stereotype.Controller;
@@ -19,9 +22,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,136 +31,142 @@ import java.util.List;
 @Controller
 @RequestMapping("/board")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
     private final MemberService memberService;
     private final FileProcess fileProcess;
-    private final FileController fileController;
+    private final FileService fileService;
 
 
     @Value("${file.dir}")
     private String fileDir;
 
-    //메인이자 전체 글 목록.
+    //게시판 메인(전체 글 목록)
     @GetMapping
-    public String boardHome(){
+    public String boardHome(Model model){
+
+         List<BoardReadDTO> boardList = new ArrayList<>();
+
+        boardService.findAllBoard().stream().forEach(b -> boardList.add(changeToBoardReadDTO(b,b.getMember().getId())));
+
+        model.addAttribute("allBoard" ,boardList);
         return "/board/board_main";
     }
 
-    //글 작성 페이지
+
+    //나만의 게시글 보기
+    @GetMapping("/myBoard")
+    public String myBoard(@Login LoginDTO loginDTO , Model model){
+        List<BoardReadDTO> boardList = new ArrayList<>();
+
+        boardService.findAllMyBoard(loginDTO.getId()).stream().forEach(b -> boardList.add(changeToBoardReadDTO(b,b.getMember().getId())));
+
+        model.addAttribute("allMyBoard", boardList);
+
+        return "/board/board_myBoard";
+    }
+
+
+    //글쓰기 페이지
     @GetMapping("/write")
     public String boardWriteForm(Model model){
         model.addAttribute("boardWriteDTO" , new BoardWriteDTO());
         return "/board/board_write";
     }
 
-    //글 작성.
-    //memberId를 어떻게 넘겨줄것인가
-    @PostMapping("/write/{memberId}")
+
+    //글쓰기 등록.
+    @PostMapping("/write")
     public String boardWriteProcess(@Validated @ModelAttribute BoardWriteDTO boardWriteDTO
-            , BindingResult bs , @PathVariable Long memberId , RedirectAttributes redirectAttributes){
+            , BindingResult bs , @Login LoginDTO loginDTO, RedirectAttributes redirectAttributes){
 
         if(bs.hasErrors()){
             return "/board/board_write";
         }
 
-        Long boardId = boardService.register(boardWriteDTO ,memberId);
+        Long boardId = boardService.register(boardWriteDTO ,loginDTO.getId());
+
         redirectAttributes.addAttribute("boardId",boardId);
+        redirectAttributes.addAttribute("memberId",loginDTO.getId());
 
-
-        return "redirect:/board/read/{boardId}";
+        return "redirect:/board/read/{boardId}/{memberId}";
     }
 
 
 
     //게시글 보기
-    @GetMapping("/read/{boardId}")
-    public String boardRead(@PathVariable Long boardId , Model model){
+    @GetMapping("/read/{boardId}/{memberId}")
+    public String boardRead(@PathVariable Long boardId,@PathVariable Long memberId , Model model){
         Board board = boardService.readOne(boardId);
 
-        isFileStore(board , model);
+        model.addAttribute("boardReadDTO" , changeToBoardReadDTO(board , memberId));
+        model.addAttribute("fileDTO" , isFileStore(board));
 
-        BoardReadDTO boardReadDTO = changeToBoardReadDTO(board);
-
-
-        model.addAttribute("boardReadDTO" , boardReadDTO);
         return "/board/board_read";
     }
 
-    //댓글 유무에 따른 model저장
-    private void isComments(Board board , Model model){
-        List<CommentReadDTO> comments = new ArrayList<>();
-        if(board.getBoardComments().size()!=0){
-            board.getBoardComments().stream().forEach(c -> comments.add(new CommentReadDTO(c.getId() , c.getWriter() , c.getCommentContent())));
 
-            model.addAttribute("comments" , comments);
-        }else{
-            model.addAttribute("comments" , comments);
-        }
-    }
+    //FileStore -> FileDTO
+    private List<FileDTO> isFileStore(Board board){
+        List<FileDTO> files = new ArrayList<>();
 
-
-    //파일 유무에 따른 model저장
-    private void isFileStore(Board board , Model model){
         if(board.getFileStores().size()!=0) {
-            List<FileDTO> files = changeToFileDTO(board.getFileStores());
-            model.addAttribute("files" , files);
-        }else{
-            model.addAttribute("files",new ArrayList<FileDTO>());
+            board.getFileStores().stream().forEach(f -> files.add(new FileDTO(f.getId(),f.getUploadFilename(),f.getServerFilename())));
         }
+        return files;
+    }
+
+    //Board -> BoardReadDTO
+    private BoardReadDTO changeToBoardReadDTO(Board board , Long memberId){
+       return new BoardReadDTO(board.getId(),memberId , board.getSubject()
+               , board.getBoardContent() , board.getWriter() , board.getCreatedDate()
+               , board.getReadCount());
     }
 
 
-    //entity -> BoardReadDTO
-    private BoardReadDTO changeToBoardReadDTO(Board board){
-        BoardReadDTO boardReadDTO = new BoardReadDTO(board.getId() , board.getSubject() , board.getBoardContent() ,
-                board.getWriter() , board.getCreatedDate() , board.getReadCount());
-        return boardReadDTO;
-    }
-
-    //entity -> FileDTO
-    private List<FileDTO> changeToFileDTO(List<FileStore> fileStores){
-        List<FileDTO> file = new ArrayList<>();
-        fileStores.stream().forEach(f -> file.add(new FileDTO(f.getId(),f.getUploadFilename() , f.getServerFilename())));
-        return file;
+    //Board -> BoardUpdateDTO
+    private BoardUpdateDTO changeToBoardUpdateDTO(Board board){
+        return new BoardUpdateDTO(board.getId(),board.getWriter(),board.getSubject(),board.getBoardContent());
     }
 
 
-
-
+    //글 수정페이지 이동.
     @GetMapping("/update/{boardId}")
     public String updateForm(@PathVariable Long boardId ,  Model model){
         Board findBoard = boardService.findOne(boardId);
 
-        isFileStore(findBoard,model);
+        model.addAttribute("boardUpdateDTO", changeToBoardUpdateDTO(findBoard));
+        model.addAttribute("fileDTO",isFileStore(findBoard));
 
-        BoardReadDTO boardReadDTO = changeToBoardReadDTO(findBoard);
-
-        model.addAttribute("boardReadDTO" , boardReadDTO);
         return "/board/board_modify";
     }
 
 
+
+    //글 수정 처리
     @PostMapping("/update/{boardId}")
-    public String updatePro(@Validated BoardReadDTO boardReadDTO,BindingResult bs , @PathVariable Long boardId ,
-                          Model model , RedirectAttributes redirectAttributes){
+    public String updatePro(@Validated BoardUpdateDTO boardUpdateDTO,BindingResult bs , @PathVariable Long boardId ,
+                         @Login LoginDTO loginDTO, RedirectAttributes redirectAttributes){
         if(bs.hasErrors()){
             return "/board/board_modify";
         }
 
-        boardService.update(boardReadDTO , boardId);
+        boardService.update(boardUpdateDTO , boardId);
 
         redirectAttributes.addAttribute("boardId",boardId);
-        return "redirect:/board/read/{boardId}";
+        redirectAttributes.addAttribute("memberId",loginDTO.getId());
+
+        return "redirect:/board/read/{boardId}/{memberId}";
     }
 
 
+    //글 삭제
     @GetMapping("/remove/{boardId}")
     public String removeBoard(@PathVariable Long boardId , RedirectAttributes redirectAttributes){
         boardService.delete(boardId);
 
-        //회원 아이디 덧붙여줘야 한다.
         return "redirect:/board";
     }
 

@@ -1,7 +1,7 @@
 package board.boardstudy.validator;
 
 
-import board.boardstudy.dto.JoinMemberDTO;
+import board.boardstudy.dto.members.MemberJoinDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,12 +13,12 @@ public class JoinValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return JoinMemberDTO.class.isAssignableFrom(clazz);
+        return MemberJoinDTO.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        JoinMemberDTO joinMemberDTO = (JoinMemberDTO)target;
+        MemberJoinDTO joinMemberDTO = (MemberJoinDTO)target;
 
         //중복 확인을 안하고 넘어왔을 경우 에러 추가.
         if(joinMemberDTO.isCheckDoubleId()==false){
