@@ -1,15 +1,11 @@
 package board.boardstudy.dto.members;
 
+import board.boardstudy.entity.Member;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
-//1.entity에는 setter를 열어두지 않기위해.
-//2.entity를 노출시키지 않기 위해.
 
 @Setter @Getter
 public class MemberJoinDTO {
@@ -39,9 +35,27 @@ public class MemberJoinDTO {
 
     private String knownRoot;
 
+    @AssertTrue
     private boolean checkDoubleId;
 
+    @AssertTrue
     private boolean checkPhone;
+
+
+    //MemberJoinDTO -> Member
+    public Member changeToMemberEntity(MemberJoinDTO joinMemberDTO){
+
+        String temp;
+
+        if(joinMemberDTO.getKnownRoot() == null){
+            temp = "선택 안함";
+        }else{
+            temp = joinMemberDTO.getKnownRoot();
+        }
+
+        return new Member(joinMemberDTO.getUsername() , joinMemberDTO.getUserId()
+                , joinMemberDTO.getPassword() , joinMemberDTO.getEmail() , joinMemberDTO.getTel() ,temp);
+    }
 
 
 }

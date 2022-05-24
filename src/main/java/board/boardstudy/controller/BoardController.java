@@ -6,8 +6,10 @@ import board.boardstudy.dto.*;
 import board.boardstudy.dto.board.BoardReadDTO;
 import board.boardstudy.dto.board.BoardUpdateDTO;
 import board.boardstudy.dto.board.BoardWriteDTO;
+import board.boardstudy.dto.paging.Pagination;
 import board.boardstudy.entity.Board;
 import board.boardstudy.entity.FileStore;
+import board.boardstudy.entity.Member;
 import board.boardstudy.file.FileProcess;
 import board.boardstudy.service.BoardService;
 import board.boardstudy.service.FileService;
@@ -17,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,38 +40,51 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final MemberService memberService;
-    private final FileProcess fileProcess;
-    private final FileService fileService;
+
 
 
     @Value("${file.dir}")
     private String fileDir;
 
+
     //게시판 메인(전체 글 목록)
     @GetMapping
-    public String boardHome(Model model){
+    public String boardHome(@RequestParam(defaultValue = "0") int pageNum , Model model){
 
-         List<BoardReadDTO> boardList = new ArrayList<>();
+        Page<BoardReadDTO> boardList = boardService.findAll(PageRequest.of(pageNum, 10, Sort.by("id").descending()));
 
-        boardService.findAllBoard().stream().forEach(b -> boardList.add(changeToBoardReadDTO(b,b.getMember().getId())));
+        model.addAttribute("allBoard" ,boardList.getContent());
+        model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));
 
-        model.addAttribute("allBoard" ,boardList);
         return "/board/board_main";
     }
 
 
-    //나만의 게시글 보기
+
+    //내가 작성한 게시글 목록 보기
     @GetMapping("/myBoard")
-    public String myBoard(@Login LoginDTO loginDTO , Model model){
-        List<BoardReadDTO> boardList = new ArrayList<>();
+    public String myBoard(@Login LoginDTO loginDTO , Model model, @RequestParam(defaultValue = "0") int pageNum){
 
-        boardService.findAllMyBoard(loginDTO.getId()).stream().forEach(b -> boardList.add(changeToBoardReadDTO(b,b.getMember().getId())));
+        Page<BoardReadDTO> boardList = boardService.findAllMyBoard(loginDTO.getId(), PageRequest.of(pageNum, 10, Sort.by("id").descending()));
 
-        model.addAttribute("allMyBoard", boardList);
+        model.addAttribute("allMyBoard", boardList.getContent());
+        model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));
 
         return "/board/board_myBoard";
     }
+
+
+    //게시글 보기
+    @GetMapping("/read/{boardId}/{memberId}")
+    public String boardRead(@PathVariable Long boardId,@PathVariable Long memberId , Model model){
+        Board board = boardService.readOne(boardId);
+
+        model.addAttribute("boardReadDTO" ,changeToBoardReadDTO(board));
+        model.addAttribute("fileDTO" , isFileStore(board));
+
+        return "/board/board_read";
+    }
+
 
 
     //글쓰기 페이지
@@ -86,50 +104,14 @@ public class BoardController {
             return "/board/board_write";
         }
 
-        Long boardId = boardService.register(boardWriteDTO ,loginDTO.getId());
+        Long boardId = boardService.register(boardWriteDTO, loginDTO.getId());
 
         redirectAttributes.addAttribute("boardId",boardId);
         redirectAttributes.addAttribute("memberId",loginDTO.getId());
 
         return "redirect:/board/read/{boardId}/{memberId}";
     }
-
-
-
-    //게시글 보기
-    @GetMapping("/read/{boardId}/{memberId}")
-    public String boardRead(@PathVariable Long boardId,@PathVariable Long memberId , Model model){
-        Board board = boardService.readOne(boardId);
-
-        model.addAttribute("boardReadDTO" , changeToBoardReadDTO(board , memberId));
-        model.addAttribute("fileDTO" , isFileStore(board));
-
-        return "/board/board_read";
-    }
-
-
-    //FileStore -> FileDTO
-    private List<FileDTO> isFileStore(Board board){
-        List<FileDTO> files = new ArrayList<>();
-
-        if(board.getFileStores().size()!=0) {
-            board.getFileStores().stream().forEach(f -> files.add(new FileDTO(f.getId(),f.getUploadFilename(),f.getServerFilename())));
-        }
-        return files;
-    }
-
-    //Board -> BoardReadDTO
-    private BoardReadDTO changeToBoardReadDTO(Board board , Long memberId){
-       return new BoardReadDTO(board.getId(),memberId , board.getSubject()
-               , board.getBoardContent() , board.getWriter() , board.getCreatedDate()
-               , board.getReadCount());
-    }
-
-
-    //Board -> BoardUpdateDTO
-    private BoardUpdateDTO changeToBoardUpdateDTO(Board board){
-        return new BoardUpdateDTO(board.getId(),board.getWriter(),board.getSubject(),board.getBoardContent());
-    }
+ 
 
 
     //글 수정페이지 이동.
@@ -142,8 +124,7 @@ public class BoardController {
 
         return "/board/board_modify";
     }
-
-
+    
 
     //글 수정 처리
     @PostMapping("/update/{boardId}")
@@ -171,5 +152,27 @@ public class BoardController {
     }
 
 
+
+    //Board -> BoardUpdateDTO
+    private BoardUpdateDTO changeToBoardUpdateDTO(Board board){
+        return new BoardUpdateDTO(board.getId(),board.getWriter(),board.getSubject(),board.getBoardContent());
+    }
+
+    //Board -> BoardReadDTO
+    private BoardReadDTO changeToBoardReadDTO(Board board){
+        return new BoardReadDTO(board.getId(),board.getMember().getId() , board.getSubject()
+                , board.getBoardContent() , board.getWriter() , board.getCreatedDate()
+                , board.getReadCount());
+    }
+    
+    //FileStore -> FileDTO
+    private List<FileDTO> isFileStore(Board board){
+        List<FileDTO> files = new ArrayList<>();
+
+        if(board.getFileStores().size()!=0) {
+            board.getFileStores().stream().forEach(f -> files.add(new FileDTO(f.getId(),f.getUploadFilename(),f.getServerFilename())));
+        }
+        return files;
+    }
 
 }

@@ -29,7 +29,7 @@ public class BoardUpdateDTO {
 
     private List<MultipartFile> files;
 
-    private List<Long> removeFiles = new ArrayList<>();
+    private List<Long> removeFiles;
 
 
 

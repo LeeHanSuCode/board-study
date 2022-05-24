@@ -33,7 +33,7 @@
 
 
             $.ajax({
-                url : '/certification/find/phone/' + tel +'/' + username,
+                url : '/tel/findId/' + tel +'/' + username,
                 type : 'post',
                 dataType : 'text',
                 success : function (data){
@@ -77,7 +77,7 @@
 
 
             $.ajax({
-                url : '/certification/find/phone/' + tel,
+                url : '/tel/findId/' + tel,
                 type : 'post',
                 dataType : 'text',
                 success : function (id){

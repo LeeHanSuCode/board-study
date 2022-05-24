@@ -1,13 +1,10 @@
 package board.boardstudy.repository;
 
 import board.boardstudy.entity.Member;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.lang.Nullable;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -17,7 +14,6 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -48,7 +44,7 @@ class MemberRepositoryTest {
 
         Member member = new Member("이한수" ,"hslee","1234","hslee@ndk3", "010-5456-5465" , null);
 
-        Long findById = memberRepository.save(member);
+        Long findById = memberRepository.save(member).getId();
 
         assertThat(member.getId()).isEqualTo(findById);
     }
@@ -57,12 +53,12 @@ class MemberRepositoryTest {
     public void 회원아이디_조회(){
         Member member = new Member("이한수" ,"hslee","1234","hslee@ndk3", "010-5456-5465" , null);
 
-        Long findId = memberRepository.save(member);
+        Long findId = memberRepository.save(member).getId();
 
         em.flush();
         em.clear();;
 
-        Member findMember = memberRepository.findById(findId);
+        Member findMember = memberRepository.findById(findId).get();
 
         assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
         assertThat(findMember.getUserId()).isEqualTo(member.getUserId());
@@ -77,7 +73,7 @@ class MemberRepositoryTest {
 
     @Test
     public void 유저아이디_조회(){
-        Member findByUserId = memberRepository.findByUserId("hslee0711").get(0);
+        Member findByUserId = memberRepository.findByUserId("hslee0711").get();
 
         assertThat(findByUserId).isNotNull();
         assertThat(findByUserId.getUserId()).isEqualTo("hslee0711");

@@ -4,39 +4,29 @@ import lombok.Getter;
 
 @Getter
 public class Pagination {
-    private int totalCommentCount; //전체 데이터수
-
+    private long totalBoardCount; //전체 데이터수
     private int totalPageCount;   //전체 페이지수
+
+    private int pageSize;       //페이지 버튼 수
+    private int pageNum;        //현재 페이지 번호
+
     private int startPage;         //첫페이지 번호
     private int endPage;        //끝페이지 번호
     private boolean existPrevPage;  //이전페이지 존재 여부
     private boolean existNextPage;   //다음페이지 존재 여부
 
-    private int pagePerComment;//한페이지당 댓글 갯수
-    private int pageSize;
-    private int pageNum;
-    private int startNum;
-    private int endNum;
 
 
-
-    public Pagination(int pageNum ,int pagePerComment, int totalCommentCount , int pageSize){
+    public Pagination(int pageNum ,int totalPageCount, long totalBoardCount , int pageSize){
        this.pageNum = pageNum;
-       this.pagePerComment = pagePerComment;
-        this.totalCommentCount = totalCommentCount;
+       this.totalPageCount = totalPageCount;
+        this.totalBoardCount = totalBoardCount;
         this.pageSize = pageSize;
 
-       calculation(pageNum, pagePerComment , totalCommentCount, pageSize);
+       calculation(pageNum, totalPageCount, pageSize);
     }
 
-    private void calculation(int pageNum , int pagePerComment , int totalCommentCount,int pageSize){
-        //가져올 데이터
-        startNum = (pageNum-1)*pagePerComment;
-        endNum = pagePerComment;
-
-
-        //전체 페이지 수 계산
-        totalPageCount = totalCommentCount/pagePerComment + (totalCommentCount%pagePerComment == 0 ? 0:1);
+    private void calculation(int pageNum , int totalPageCount,int pageSize){
 
         if(pageNum % 10 != 0){
             startPage = (pageNum/pageSize)*pageSize+1;
@@ -45,7 +35,7 @@ public class Pagination {
         }
 
         endPage = startPage + pageSize-1;
-        if(endPage > totalPageCount) endPage = totalCommentCount;
+        if(endPage > totalPageCount) endPage = totalPageCount;
 
 
 

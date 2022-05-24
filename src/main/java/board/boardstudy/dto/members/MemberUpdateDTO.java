@@ -1,5 +1,6 @@
 package board.boardstudy.dto.members;
 
+import board.boardstudy.entity.Member;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,7 @@ import javax.validation.constraints.*;
 @Getter @Setter
 public class MemberUpdateDTO {
 
-    public MemberUpdateDTO(String username , String tel , String email
-    ){
+    public MemberUpdateDTO(String username , String tel , String email){
         this.username = username;
         this.email =email;
         this.tel =tel;
@@ -35,4 +35,14 @@ public class MemberUpdateDTO {
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$")
     @NotBlank
     private String tel;
+
+
+    //Member -> MemberUpdateDTO
+    public MemberUpdateDTO changeToMemberUpdateDTO(MemberUpdateDTO memberUpdateDTO){
+        return new MemberUpdateDTO(memberUpdateDTO.getUsername() ,memberUpdateDTO.getTel() ,memberUpdateDTO.getEmail());
+    }
+
+
+
+
 }

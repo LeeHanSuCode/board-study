@@ -33,7 +33,7 @@
 
 
             $.ajax({
-                url : '/email_certification/find/email/' + email +'/' + username,
+                url : '/email/findId/' + email +'/' + username,
                 type : 'post',
                 dataType : 'text',
                 success : function (data){
@@ -77,7 +77,7 @@
 
 
             $.ajax({
-                url : '/email_certification/find/email/' + email,
+                url : '/email/findId/' + email,
                 type : 'post',
                 dataType : 'text',
                 success : function (id){

@@ -10,9 +10,9 @@ import java.util.HashMap;
 @Service
 public class PhoneService {
 
-    public void joinCertification(String tel ,String numStr){
+    public String joinCertification(String tel ,String numStr){
         String api_key = "api";
-        String api_secret = "api_secret";
+        String api_secret = "apise";
 
 
         Message coolsms = new Message(api_key,api_secret);
@@ -26,7 +26,11 @@ public class PhoneService {
             e.getMessage();
            e.printStackTrace();
         }
+
+        return numStr;
     }
+
+
 
     private HashMap<String,String> message(String tel , String numStr){
         HashMap<String, String> params = new HashMap<String, String>();

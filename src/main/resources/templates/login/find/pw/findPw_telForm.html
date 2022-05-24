@@ -39,7 +39,7 @@
 
 
             $.ajax({
-                url : '/certification/findPw/phone/' + tel +'/' + username + '/' + userId,
+                url : '/tel/findPw/' + tel +'/' + username + '/' + userId,
                 type : 'post',
                 dataType : 'text',
                 success : function (data){
@@ -76,7 +76,7 @@
                 $("#certification").attr("readOnly",true);
                 $("#certificationButton").attr("disabled",true);
                 $("#sendMessages").attr("disabled",true);
-                location.href = '/certification/changePw/' + userId
+                location.href = '/tel/changePw/' + userId
             }else{
                 alert('잘못된 인증번호 입니다.');
                 return

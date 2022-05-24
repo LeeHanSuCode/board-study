@@ -3,11 +3,9 @@ package board.boardstudy.controller;
 import board.boardstudy.argument.Login;
 import board.boardstudy.dto.members.MemberJoinDTO;
 import board.boardstudy.dto.LoginDTO;
-import board.boardstudy.dto.members.MemberInfoDTO;
 import board.boardstudy.dto.members.MemberUpdateDTO;
 import board.boardstudy.entity.Member;
 import board.boardstudy.service.MemberService;
-import board.boardstudy.validator.JoinValidator;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,49 +23,38 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class MemberController {
 
-    private final JoinValidator joinValidator;
     private final MemberService memberService;
 
-    @InitBinder("joinMemberDTO")
-    public void init(WebDataBinder dataBinder){
-        dataBinder.addValidators(joinValidator);
-    }
 
     //회원가입화면
     @GetMapping("/join")
     public String joinForm(Model model){
-        model.addAttribute("joinMemberDTO" , new MemberJoinDTO());
+        model.addAttribute("memberJoinDTO" , new MemberJoinDTO());
         return "/members/joinForm";
     }
 
 
     //회원가입
     @PostMapping("/join")
-    public String join(@Validated @ModelAttribute MemberJoinDTO joinMemberDTO, BindingResult bs){
+    public String join(@Validated @ModelAttribute MemberJoinDTO memberJoinDTO, BindingResult bs){
 
         if(bs.hasErrors()){
-            joinMemberDTO.setCheckPhone(false);
             return "/members/joinForm";
         }
 
-        memberService.join(changeMemberEntity(joinMemberDTO));
+        //비밀번호,비밀번호 확인 일치 여부.
+        isEqualsPw(memberJoinDTO.getPassword(),memberJoinDTO.getPassword2(),bs);
+
+        if(bs.hasErrors()){
+            memberJoinDTO.setCheckPhone(false);
+            return "/members/joinForm";
+        }
+
+        memberService.join(memberJoinDTO.changeToMemberEntity(memberJoinDTO));
 
         return "redirect:/";
     }
 
-
-    //joinDTO -> member
-    public Member changeMemberEntity(MemberJoinDTO joinMemberDTO){
-        String temp;
-        if(joinMemberDTO.getKnownRoot() == null){
-            temp = null;
-        }else{
-            temp = joinMemberDTO.getKnownRoot();
-        }
-
-        return new Member(joinMemberDTO.getUsername() , joinMemberDTO.getUserId()
-                , joinMemberDTO.getPassword() , joinMemberDTO.getEmail() , joinMemberDTO.getTel() ,temp);
-    }
 
 
     //회원 상세 정보
@@ -78,20 +63,12 @@ public class MemberController {
 
         Member findMember = memberService.findById(loginDTO.getId());
 
-        model.addAttribute("memberInfoDTO" ,changeToMemberInfoDTO(findMember));
+        model.addAttribute("memberInfoDTO" ,new MemberUpdateDTO(findMember.getUsername(),
+                findMember.getTel() ,findMember.getEmail()));
 
         return "/members/memberInfo";
     }
 
-    //Member -> MemberInfoDTO
-    private MemberInfoDTO changeToMemberInfoDTO(Member member){
-        return new MemberInfoDTO(member.getUsername() ,member.getTel() ,member.getEmail() );
-    }
-
-    //Member -> UpdateMemberDTO
-    private MemberUpdateDTO changeToUpdateMemberDTO(Member member){
-        return new MemberUpdateDTO(member.getUsername() ,member.getTel() ,member.getEmail() );
-    }
 
 
     //회원 수정
@@ -99,29 +76,39 @@ public class MemberController {
     public String updateForm(@Login LoginDTO loginDTO , Model model){
         Member findMember = memberService.findById(loginDTO.getId());
 
-        model.addAttribute("updateMemberDTO" ,changeToUpdateMemberDTO(findMember));
+        model.addAttribute("memberUpdateDTO" ,new MemberUpdateDTO(findMember.getUsername(),
+                findMember.getTel() ,findMember.getEmail()));
+
         return "/members/updateForm";
     }
 
+
+
     //회원 수정
     @PostMapping("/update")
-    public String update(@Validated @ModelAttribute MemberUpdateDTO updateMemberDTO , BindingResult bs ,
-                         @Login LoginDTO loginDTO, RedirectAttributes redirectAttributes){
+    public String update(@Validated @ModelAttribute MemberUpdateDTO memberUpdateDTO , BindingResult bs ,
+                         @Login LoginDTO loginDTO){
 
         if(bs.hasErrors()){
             return "/members/updateForm";
         }
+        //비밀번호,비밀번호 확인 일치 여부.
+        isEqualsPw(memberUpdateDTO.getPassword(),memberUpdateDTO.getPassword2(),bs);
 
-        if(!updateMemberDTO.getPassword().equals(updateMemberDTO.getPassword2())){
-            bs.rejectValue("password","NotEquals","비밀번호가 일치하지 않습니다.");
+        if(bs.hasErrors()){
             return "/members/updateForm";
         }
-
-        memberService.updateMember(loginDTO.getId() , updateMemberDTO);
-
-        redirectAttributes.addAttribute("id",loginDTO.getId());
+        memberService.updateMember(loginDTO.getId() , memberUpdateDTO);
 
         return "redirect:/members/info";
+    }
+
+
+    //비밀번호 확인 일치 여부
+    private void isEqualsPw(String password , String password2 , BindingResult bs){
+        if(!password.equals(password2)) {
+            bs.rejectValue("password", "NotEquals", "비밀번호가 일치하지 않습니다.");
+        }
     }
 
 
@@ -133,6 +120,7 @@ public class MemberController {
     }
 
 
+    //회원 삭제
     @GetMapping("/remove")
     public String remove(@Login LoginDTO loginDTO , HttpServletRequest request){
         memberService.removeMember(loginDTO.getId());

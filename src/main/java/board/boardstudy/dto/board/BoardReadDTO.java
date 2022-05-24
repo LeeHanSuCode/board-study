@@ -39,4 +39,5 @@ public class BoardReadDTO {
     private Integer readCount;
 
 
+
 }

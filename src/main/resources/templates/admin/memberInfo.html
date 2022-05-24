@@ -10,7 +10,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
 
-
 	<style>
 		.container {
 			max-width: 560px;
@@ -34,44 +33,33 @@
 		<div class="col-sm-6">
 			<div class="card shadow">
 				<div class="card-body">
-					<form th:action="@{/members/update}" method="post" th:object="${memberUpdateDTO}">
+					<form action="updateForm.html" th:action="@{/members/update}" th:object="${memberInfoDTO}" method="get">
 					<div class="form-group">
 						<label for="username">이름</label>
-						<input type="text" id="username" th:field="*{username}" class="form-control"  readonly="true"  value="홍길동"/>
+						<input type="text" id="username" th:field="*{userId}"  class="form-control"  disabled="true"/>
 					</div>
-
 						<div class="form-group">
-							<label for="password">비밀번호</label>
-							<input type="password" id="password" th:field="*{password}" class="form-control" th:errorclass="field-error"/>
-							<div class="field-error" th:errors="*{password}">
-								비번 오류
-							</div>
+							<label for="userId">이름</label>
+							<input type="text" id="userId" th:field="*{username}"  class="form-control"  disabled="true"/>
 						</div>
-
-						<div class="form-group">
-							<label for="password2">비밀번호 확인</label>
-							<input type="password" id="password2" th:field="*{password2}" class="form-control"/>
-						</div>
-
 						<div class="form-group">
 							<label for="email">이메일</label>
-							<input type="text" id="email" th:field="*{email}" class="form-control"   th:errorclass="field-error" value="이메일"/>
-							<div class="field-error" th:errors="*{email}">
-								이메일 오류
-							</div>
+							<input type="text" id="email" th:field="*{email}"  class="form-control" disabled="true"/>
 						</div>
 
 						<div class="form-group">
 							<label for="tel">전화번호</label>
-							<input type="text" id="tel" th:field="*{tel}" class="form-control"   th:errorclass="field-error" value="전화번호"/>
-							<div class="field-error" th:errors="*{tel}">
-								전화번호 오류
-							</div>
+							<input type="text" id="tel" th:field="*{tel}"  class="form-control" disabled="true"/>
 						</div>
 
-					<div class="form-group">
+						<div class="form-group">
+							<label for="root">전화번호</label>
+							<input type="text" id="root" th:field="*{root}"  class="form-control" disabled="true"/>
+						</div>
+
+						<div class="form-group">
 						<div class="text-right">
-							<button type="submit" class="btn btn-primary">정보수정</button>
+							<a  class="btn btn-danger" th:href="@{/admin/member/delete/{memberId}(memberId=${memberInfoDTO.id})}">회원 삭제</a>
 						</div>
 					</div>
 					

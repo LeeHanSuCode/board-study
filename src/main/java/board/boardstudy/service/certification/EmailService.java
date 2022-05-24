@@ -22,7 +22,7 @@ public class EmailService{
 
     public String mail(String email ,String num){
 
-        String from ="메일";      //보내는 메일
+        String from ="dlsdn857758@gmail.com";      //보내는 메일
         String to = email;
         String title = "studyBoard 인증번호 입니다.";
         String content="[인증번호]" + num + "입니다 <br /> 인증번호 확인란에 기입해주세요.";

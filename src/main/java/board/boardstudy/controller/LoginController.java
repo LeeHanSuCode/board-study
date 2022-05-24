@@ -1,7 +1,7 @@
 package board.boardstudy.controller;
 
 import board.boardstudy.dto.LoginDTO;
-import board.boardstudy.dto.find.FindId_telDTO;
+import board.boardstudy.dto.find.FindDTO;
 import board.boardstudy.entity.Member;
 import board.boardstudy.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 
 @Controller
 @RequestMapping("/login")
@@ -77,7 +75,6 @@ public class LoginController {
     }
 
 
-
     //아아디 찾기
     @GetMapping("/findId")
     public String findId_Form(){
@@ -86,31 +83,22 @@ public class LoginController {
 
     //비밀번호 찾기
     @GetMapping("/findPassword")
-    public String findPassord_Form(){
+    public String findPassword_Form(){
         return "/login/find/pw/find_password";
     }
 
     //아이디 찾기 -> telForm
     @GetMapping("/findId_tel")
-    public String findId_telForm(Model model){
-        model.addAttribute("findIdDTO" , new FindId_telDTO());
+    public String findId_telForm(){
         return "/login/find/id/findId_telForm";
     }
-
-
-
-    @PostMapping("/findId_tel")
-    public String findId_telPro(Model model){
-        model.addAttribute("findIdDTO" , new FindId_telDTO());
-        return "/login/find/id/findId_emailForm";
-    }
-
 
     //아이디 찾기 -> emailForm
     @GetMapping("/findId_email")
     public String findId_emailForm(){
         return "/login/find/id/findId_emailForm";
     }
+
 
     //비밀번호 찾기 ->telForm
     @GetMapping("/findPw_tel")

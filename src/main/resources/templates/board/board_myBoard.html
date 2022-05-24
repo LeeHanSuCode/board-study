@@ -45,57 +45,38 @@
 				</tbody>
 			</table>
 
-			<!--<div class="d-none d-md-block">
-				<ul class="pagination justify-content-center">
-					<li class="page-item">
-						<a href="#" class="page-link">이전</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">1</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">2</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">3</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">4</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">5</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">6</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">7</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">8</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">9</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">10</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">다음</a>
-					</li>
-				</ul>
-			</div>-->
 
-		<!--	<div class="d-block d-md-none">
+			<div class="d-none d-md-block">
 				<ul class="pagination justify-content-center">
-					<li class="page-item">
-						<a href="#" class="page-link">이전</a>
-					</li>
-					<li class="page-item">
-						<a href="#" class="page-link">다음</a>
-					</li>
+					<th:block th:if="${page.isExistPrevPage()}">
+						<li class="page-item">
+							<a th:href="@{/board/myBoard(pageNum=${page.startPage-11})}" class="page-link">이전</a>
+						</li>
+					</th:block>
+					<th:block th:unless="${page.isExistPrevPage()}">
+						<li class="page-item">
+							<a th:disabled="true" class="page-link">이전</a>
+						</li>
+					</th:block>
+
+					<th:block th:each="pageNum:${#numbers.sequence(page.startPage,page.endPage)}">
+						<li class="page-item">
+							<a th:href="@{/board/myBoard(pageNum=${pageNum}-1)}" th:text="${pageNum}" class="page-link">1</a>
+						</li>
+					</th:block>
+					<th:block th:if="${page.isExistNextPage()}">
+						<li class="page-item">
+							<a th:href="@{/board/myBoard(pageNum=${page.startPage+9})}" class="page-link">다음</a>
+						</li>
+					</th:block>
+					<th:block th:unless="${page.isExistNextPage()}">
+						<li class="page-item">
+							<a th:disabled="true" class="page-link">다음</a>
+						</li>
+					</th:block>
 				</ul>
-			</div>-->
+			</div>
+
 
 			<div class="text-right">
 				<a href="board_write.html" th:href="@{/board/write}" class="btn btn-primary">글쓰기</a>

@@ -65,7 +65,7 @@
 
 
 		$.ajax({
-			url : '/certification/phone/' + tel,
+			url : '/tel/phone/' + tel,
 			type : 'post',
 			dataType : 'text',
 			success : function (data){
@@ -125,7 +125,7 @@
 		<div class="col-sm-6">
 			<div class="card shadow">
 				<div class="card-body">
-					<form action="../login/login.html" th:action="@{/members/join}" method="post" th:object="${joinMemberDTO}">
+					<form action="../login/login.html" th:action="@{/members/join}" method="post" th:object="${memberJoinDTO}">
 						<div class="form-group">
 							<label for="username">이름</label>
 							<input type="text" id="username" th:field="*{username}" class="form-control"

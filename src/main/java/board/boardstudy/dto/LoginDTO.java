@@ -10,6 +10,7 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 public class LoginDTO {
 
+
     private Long id;
 
     @NotBlank
@@ -17,6 +18,8 @@ public class LoginDTO {
     @NotBlank
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$")
     private String password;
+
+    private String username;
 
     private String password2;
 

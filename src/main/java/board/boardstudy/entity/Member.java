@@ -4,6 +4,7 @@ import board.boardstudy.entity.mappedEntity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -16,10 +17,8 @@ import java.util.List;
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @SequenceGenerator(
         name="MEMBER_SEQ_GENERATOR",
-        sequenceName = "MEMBER_SEQ", //DB시퀀스이름
+        sequenceName = "MEMBER_SEQ",
         initialValue = 1 , allocationSize = 1)
-
-//성능 고려해서 allocationSize 을 10을 주어 한번에 10씩 당겨오자.
 
 public class Member extends BaseEntity {
 
@@ -31,9 +30,12 @@ public class Member extends BaseEntity {
         this.tel = tel;
         this.memberGrade = MemberGrade.NORMAL;
 
-        if(knownRoot != null){
+        if(knownRoot == null){
+            this.knownRoot = "선택 안함";
+        } else{
             this.knownRoot = knownRoot;
         }
+
         createdDate = LocalDateTime.now();
         updatedDate = LocalDateTime.now();
     }
@@ -58,7 +60,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberGrade memberGrade;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member" , orphanRemoval = true , cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();
 
 

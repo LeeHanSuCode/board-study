@@ -1,5 +1,6 @@
 package board.boardstudy.dto.members;
 
+import board.boardstudy.entity.Member;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,4 +17,6 @@ public class MemberInfoDTO {
     private String username;
     private String tel;
     private String email;
+
+
 }
