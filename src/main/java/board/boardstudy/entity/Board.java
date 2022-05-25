@@ -50,10 +50,10 @@ public class Board extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "board",orphanRemoval = true , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board")
     private List<Comments> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board" , orphanRemoval = true , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board")
     private List<FileStore> fileStores = new ArrayList<>();
 
     //연관관계 메서드

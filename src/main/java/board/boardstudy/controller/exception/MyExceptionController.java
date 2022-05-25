@@ -13,6 +13,24 @@ public class MyExceptionController {
         return "/error/members";
     }
 
+
+    @GetMapping("/board")
+    public String boardErrors(){
+        return "/error/board";
+    }
+
+
+    @GetMapping("/file")
+    public String fileErrors(){
+        return "/error/file";
+    }
+
+
+    @GetMapping("/comments")
+    public String commentsError(){
+        return "error/comments";
+    }
+
 }
 
 //전화번호와 이메일로 찾는 것은 restful방식이다 . 고로 -> excetpion처리보다는 따로 별도의 코드를

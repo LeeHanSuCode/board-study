@@ -8,12 +8,7 @@ import board.boardstudy.dto.board.BoardUpdateDTO;
 import board.boardstudy.dto.board.BoardWriteDTO;
 import board.boardstudy.dto.paging.Pagination;
 import board.boardstudy.entity.Board;
-import board.boardstudy.entity.FileStore;
-import board.boardstudy.entity.Member;
-import board.boardstudy.file.FileProcess;
 import board.boardstudy.service.BoardService;
-import board.boardstudy.service.FileService;
-import board.boardstudy.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +22,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
@@ -134,7 +128,8 @@ public class BoardController {
             return "/board/board_modify";
         }
 
-        boardService.update(boardUpdateDTO , boardId);
+
+        boardService.update(boardUpdateDTO,boardId);
 
         redirectAttributes.addAttribute("boardId",boardId);
         redirectAttributes.addAttribute("memberId",loginDTO.getId());

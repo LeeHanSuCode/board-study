@@ -53,19 +53,6 @@ public class CommentController {
       }
 
 
-      //CommentsList -> CommentReadDTOList
-      private List<CommentReadDTO> changeToCommentReadDTO_List(List<Comments> comments){
-          List<CommentReadDTO> list = new ArrayList<>();
-
-          if(comments.size() > 0) {
-              comments.stream().forEach(c -> list.add(new CommentReadDTO(c.getId(),
-                      c.getMember().getId(),c.getWriter(), c.getCommentContent(), c.getCreatedDate())));
-          }
-
-           return list;
-      }
-
-
       //댓글 조회
       @GetMapping("/list/{boardId}")
       @ResponseBody
@@ -102,6 +89,18 @@ public class CommentController {
         return "true";
     }
 
+
+    //CommentsList -> CommentReadDTOList
+    private List<CommentReadDTO> changeToCommentReadDTO_List(List<Comments> comments){
+        List<CommentReadDTO> list = new ArrayList<>();
+
+        if(comments.size() > 0) {
+            comments.stream().forEach(c -> list.add(new CommentReadDTO(c.getId(),
+                    c.getMember().getId(),c.getWriter(), c.getCommentContent(), c.getCreatedDate())));
+        }
+
+        return list;
+    }
 
 
 

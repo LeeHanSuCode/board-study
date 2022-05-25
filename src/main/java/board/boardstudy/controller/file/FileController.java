@@ -1,9 +1,5 @@
-package board.boardstudy.controller;
+package board.boardstudy.controller.file;
 
-import board.boardstudy.dto.FileDTO;
-import board.boardstudy.entity.Board;
-import board.boardstudy.entity.FileStore;
-import board.boardstudy.file.FileProcess;
 import board.boardstudy.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +13,6 @@ import org.springframework.web.util.UriUtils;
 
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/file")

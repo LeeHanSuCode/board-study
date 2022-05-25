@@ -1,4 +1,4 @@
-package board.boardstudy.file;
+package board.boardstudy.controller.file;
 
 import board.boardstudy.entity.Board;
 import board.boardstudy.entity.FileStore;

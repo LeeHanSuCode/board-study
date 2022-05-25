@@ -3,9 +3,12 @@ package board.boardstudy.service;
 import board.boardstudy.dto.LoginDTO;
 import board.boardstudy.dto.find.FindDTO;
 import board.boardstudy.dto.members.MemberUpdateDTO;
+import board.boardstudy.entity.Board;
+import board.boardstudy.entity.Comments;
+import board.boardstudy.entity.FileStore;
 import board.boardstudy.entity.Member;
 import board.boardstudy.exception.MemberException;
-import board.boardstudy.repository.MemberRepository;
+import board.boardstudy.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,9 @@ import java.util.List;
 public class MemberService {
     
     private final MemberRepository memberRepository;
+    private final FileStoreRepository fileStoreRepository;
+    private final CommentsRepository commentRepository;
+    private final BoardRepository boardRepository;
     
     
     //가입
@@ -98,8 +104,31 @@ public class MemberService {
     //삭제
     @Transactional
     public void removeMember(Long id){
-       memberRepository.delete(memberRepository.findById(id)
-               .orElseThrow(() -> new MemberException("존재하지 않는 회원 입니다.")));
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberException("존재하지 않는 회원 입니다."));
+
+        for(Board b :  member.getBoardList()){
+            deletedByMember(b);
+            boardRepository.delete(b);
+        }
+
+        memberRepository.delete(member);
     }
+
+    //게시글삭제시 -> 댓글,파일 같이 삭제.
+    private void deletedByMember(Board board){
+
+        if(board.getFileStores().size()>0){
+            for(FileStore f : board.getFileStores()){
+                fileStoreRepository.delete(f);
+            }
+        }
+        if(board.getComments().size() > 0){
+            for(Comments c : board.getComments()){
+                commentRepository.delete(c);
+            }
+        }
+    }
+    
     
 }

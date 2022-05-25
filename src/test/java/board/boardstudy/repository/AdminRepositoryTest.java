@@ -12,12 +12,7 @@ class AdminRepositoryTest {
 
     @Autowired
     private AdminRepository adminRepository;
-    @Autowired
-    private MemberRepository3 memberRepository;
 
-    @Test
-    public void 특정회원게시글(){
-        Member findMember = memberRepository.findById(1L);
-        adminRepository.allBoardMember(findMember);
-    }
+
+
 }

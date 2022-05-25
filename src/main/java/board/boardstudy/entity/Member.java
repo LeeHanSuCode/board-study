@@ -60,7 +60,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberGrade memberGrade;
 
-    @OneToMany(mappedBy = "member" , orphanRemoval = true , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member")
     private List<Board> boardList = new ArrayList<>();
 
 

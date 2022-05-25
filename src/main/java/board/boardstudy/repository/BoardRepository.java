@@ -9,10 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
+
 
 public interface BoardRepository extends JpaRepository<Board,Long> {
 
         @Query("select b from Board b where b.member=:member")
         public Page<Board> findMyBoardAll(@Param("member") Member member , Pageable pageable);
+
+        @Query("select b from Board b where b.member=:member")
+        public List<Board> findByMemberId(@Param("member") Member member);
 }
