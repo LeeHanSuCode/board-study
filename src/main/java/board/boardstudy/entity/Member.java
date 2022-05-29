@@ -28,7 +28,6 @@ public class Member extends BaseEntity {
         this.password = password;
         this.email = email;
         this.tel = tel;
-        this.memberGrade = MemberGrade.NORMAL;
 
         if(knownRoot == null){
             this.knownRoot = "선택 안함";
@@ -57,8 +56,6 @@ public class Member extends BaseEntity {
 
     private String knownRoot;
 
-    @Enumerated(EnumType.STRING)
-    private MemberGrade memberGrade;
 
     @OneToMany(mappedBy = "member")
     private List<Board> boardList = new ArrayList<>();
