@@ -14,14 +14,14 @@ import java.util.List;
 class CommentRepositoryTest {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentsRepository commentRepository;
     @Autowired
-    private BoardRepository2 boardRepository;
+    private BoardRepository boardRepository;
 
     @Test
     public void getComment(){
-        Board findBoard = boardRepository.findOne(3L);
-        List<Comments> comments = commentRepository.allComment(findBoard);
+        Board findBoard = boardRepository.findById(3L).get();
+        List<Comments> comments = commentRepository.findByBoardId(findBoard);
 
         for (Comments comment : comments) {
             System.out.print("comment.getId : " + comment.getId());

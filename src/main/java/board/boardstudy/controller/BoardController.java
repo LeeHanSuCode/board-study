@@ -53,6 +53,20 @@ public class BoardController {
         return "/board/board_main";
     }
 
+    //게시글 목록(조건)
+    @GetMapping("/condition")
+    public String boardCondition(@RequestParam(defaultValue = "0") int pageNum,
+                                 BoardSearchCondition boardSearchCondition,
+                                 Model model){
+
+        Page<BoardReadDTO> boardList = boardService.findCondition(boardSearchCondition,PageRequest.of(pageNum, 10, Sort.by("id").descending()));
+
+        model.addAttribute("allBoard" ,boardList.getContent());
+        model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));
+
+        return "/board/board_main";
+    }
+
 
 
     //내가 작성한 게시글 목록 보기
@@ -71,10 +85,9 @@ public class BoardController {
     //게시글 보기
     @GetMapping("/read/{boardId}/{memberId}")
     public String boardRead(@PathVariable Long boardId,@PathVariable Long memberId , Model model){
-        Board board = boardService.readOne(boardId);
+        BoardReadDTO boardReadDTO = boardService.readOne(boardId);
 
-        model.addAttribute("boardReadDTO" ,changeToBoardReadDTO(board));
-        model.addAttribute("fileDTO" , isFileStore(board));
+        model.addAttribute("boardReadDTO" ,boardReadDTO);
 
         return "/board/board_read";
     }
@@ -111,10 +124,9 @@ public class BoardController {
     //글 수정페이지 이동.
     @GetMapping("/update/{boardId}")
     public String updateForm(@PathVariable Long boardId ,  Model model){
-        Board findBoard = boardService.findOne(boardId);
+        BoardReadDTO boardReadDTO = boardService.readModify(boardId);
 
-        model.addAttribute("boardUpdateDTO", changeToBoardUpdateDTO(findBoard));
-        model.addAttribute("fileDTO",isFileStore(findBoard));
+        model.addAttribute("boardUpdateDTO", boardReadDTO);
 
         return "/board/board_modify";
     }
@@ -153,12 +165,7 @@ public class BoardController {
         return new BoardUpdateDTO(board.getId(),board.getWriter(),board.getSubject(),board.getBoardContent());
     }
 
-    //Board -> BoardReadDTO
-    private BoardReadDTO changeToBoardReadDTO(Board board){
-        return new BoardReadDTO(board.getId(),board.getMember().getId() , board.getSubject()
-                , board.getBoardContent() , board.getWriter() , board.getCreatedDate()
-                , board.getReadCount());
-    }
+
     
     //FileStore -> FileDTO
     private List<FileDTO> isFileStore(Board board){

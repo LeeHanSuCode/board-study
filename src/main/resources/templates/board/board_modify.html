@@ -65,8 +65,8 @@
 						</div>
 						<div class="form-group">
 							<label for="boardContent">내용</label>
-							<textarea id="boardContent" th:field="*{content}" class="form-control" rows="10" style="resize:none" th:errorclass="field-error">본문입니다</textarea>
-							<div class="field-error" th:errors="*{content}">
+							<textarea id="boardContent" th:field="*{boardContent}" class="form-control" rows="10" style="resize:none" th:errorclass="field-error">본문입니다</textarea>
+							<div class="field-error" th:errors="*{boardContent}">
 								내용오류
 							</div>
 						</div>
@@ -76,7 +76,7 @@
 						</div>
 						<div class="form-group">
 							<div>
-								<div th:if="${fileDTO.size() > 0}" th:each="file : ${fileDTO}">
+								<div th:if="${boardUpdateDTO.getFileDTO().size() > 0}" th:each="file : ${boardUpdateDTO.getFileDTO()}">
 									<div>첨부파일<a th:href="|/file/download/${file.uploadFilename}/${file.serverFilename}|" th:text="${file.uploadFilename}">파일이름</a>
 										<input type="hidden" th:id="${file.id}" name="removeFiles" th:value="${file.id}">
 										<button class="btn btn-danger" th:id="|remove${file.id}|" th:onclick="|javascript:removeFile(${file.id})|">X</button></div>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/login")
@@ -30,6 +31,8 @@ public class LoginController {
         return "/login/login";
     }
 
+
+
     @PostMapping
     public String login_process(@Validated LoginDTO loginDTO, BindingResult bs , HttpServletRequest request
                                 , @RequestParam(defaultValue = "/") String requestURI){
@@ -37,30 +40,32 @@ public class LoginController {
             return "/login/login";
         }
 
-        Member findMember = memberService.findByUserId(loginDTO.getUserId());
+        Optional<Member> member = memberService.loginFindUserId(loginDTO.getUserId());
 
-        if(!findMember.getPassword().equals(loginDTO.getPassword())){
+        if(member.isEmpty()){
             bs.reject("NotMember","존재하지 않는 회원 입니다.");
             return "/login/login";
-        }
+        }else{
+            Member findMember = member.get();
 
-        createSession(request,findMember);
+            if(!findMember.getPassword().equals(loginDTO.getPassword())){
+                bs.reject("NotMember","존재하지 않는 회원 입니다.");
+                return "/login/login";
+            }
+
+            createSession(request,findMember);
+        }
 
         return "redirect:" + requestURI;
     }
+
+
 
     //세션 만들기.
     private void createSession(HttpServletRequest request , Member member){
         HttpSession session = request.getSession();
 
-        LoginDTO loginMember = new LoginDTO();
-
-        loginMember.setUserId(member.getUserId());
-        loginMember.setWriter(member.getUsername());
-        loginMember.setGrade(member.getMemberGrade());
-        loginMember.setId(member.getId());
-
-        session.setAttribute("loginMember" , loginMember);
+        session.setAttribute("loginMember" , new LoginDTO(member.getId() , member.getUserId() , member.getUsername()));
     }
 
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -55,6 +56,12 @@ public class MemberService {
         return memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원 입니다."));
     }
+
+    //로그인시 유저 아이디로 조회
+    public Optional<Member> loginFindUserId(String userId){
+        return memberRepository.findByUserId(userId);
+    }
+
 
     //전화번호로 조회
     public FindDTO findByTel(String tel){

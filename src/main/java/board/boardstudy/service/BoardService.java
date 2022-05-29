@@ -1,5 +1,6 @@
 package board.boardstudy.service;
 
+import board.boardstudy.dto.BoardSearchCondition;
 import board.boardstudy.dto.board.BoardReadDTO;
 import board.boardstudy.dto.board.BoardUpdateDTO;
 import board.boardstudy.dto.board.BoardWriteDTO;
@@ -77,25 +78,49 @@ public class BoardService {
         return boardRepository.findMyBoardAll(member,pageable).map(b -> new BoardReadDTO(b.getId(),b.getMember().getId(),b.getSubject(),b.getBoardContent(),
                 b.getWriter(),b.getCreatedDate(),b.getReadCount()));
     }
-    
+
+    //게시글 검색 조회
+    public Page<BoardReadDTO> findCondition(BoardSearchCondition boardSearchCondition , Pageable pageable){
+         return boardRepository.findSearch(boardSearchCondition, pageable)
+                 .map(b -> new BoardReadDTO(b.getId(),b.getMember().getId(),b.getSubject(),b.getBoardContent(),
+                b.getWriter(),b.getCreatedDate(),b.getReadCount()));
+    }
+
 
     //조회수 증가 x 단건 조회
     public Board findOne(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException("존재하지 않는 게시글입니다."));
-        
+
     }
 
     //조회수 증가 단건 조회
     @Transactional
-    public Board readOne(Long boardId) {
+    public BoardReadDTO readOne(Long boardId) {
 
-        Board findBoard = boardRepository.findById(boardId)
+        Board findBoard = boardRepository.findByIdAndFile(boardId)
                 .orElseThrow(() -> new BoardException("존재하지 않는 게시글입니다."));
 
         findBoard.addReadCount();
 
-        return findBoard;
+        BoardReadDTO boardReadDTO = new BoardReadDTO().changeToBoardReadDTO(findBoard);
+
+        boardReadDTO.checkFileList(findBoard);
+
+
+        return boardReadDTO;
+    }
+
+    //조회수 증가 x 단건 조회(수정 페이지 이동)
+    public BoardReadDTO readModify(Long boardId){
+        Board findBoard = boardRepository.findByIdAndFile(boardId)
+                .orElseThrow(() -> new BoardException("존재하지 않는 게시글입니다."));
+
+        BoardReadDTO boardReadDTO = new BoardReadDTO().changeToBoardReadDTO(findBoard);
+
+        boardReadDTO.checkFileList(findBoard);
+
+        return boardReadDTO;
     }
 
 
@@ -103,7 +128,7 @@ public class BoardService {
     @Transactional
     public Long update(BoardUpdateDTO boardUpdateDTO , Long boardId) {
 
-        Board findBoard = boardRepository.findById(boardId)
+        Board findBoard = boardRepository.findByIdAndFile(boardId)
                 .orElseThrow(() -> new BoardException("존재하지 않는 게시글입니다."));
 
         //파일 전부 삭제해야 할 경우.
@@ -117,7 +142,7 @@ public class BoardService {
             ioFileSave(boardUpdateDTO.getFiles(), findBoard);
         }
 
-        findBoard.updateBoard(boardUpdateDTO.getContent(), boardUpdateDTO.getSubject());
+        findBoard.updateBoard(boardUpdateDTO.getBoardContent(), boardUpdateDTO.getSubject());
 
         return findBoard.getId();
     }

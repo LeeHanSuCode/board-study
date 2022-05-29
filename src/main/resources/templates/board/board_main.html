@@ -8,10 +8,23 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+
+	<script>
+		function subject(){
+			$("#keyword").attr("name","subject");
+		}
+
+		function writer(){
+			$("#keyword").attr("name","writer");
+		}
+	</script>
+
 </head>
 <body>
 <!--상단 메뉴-->
 <nav th:replace="~{/template/fragment/menu :: menu}"></nav>
+
 
 
 <!-- 게시글 리스트 -->
@@ -19,6 +32,24 @@
 	<div class="card">
 		<div class="card-body">
 			<h4 class="card-title font-italic">StudyBoard</h4>
+			<!-- search{s} -->
+			<form method="get" th:action="@{/board/condition}">
+			<div class="form-group row justify-content-center">
+				<div class="w100" style="padding-right:10px">
+					<input type="radio" name="searchType" th:text="제목" th:onclick="|javascript:subject()|">
+					<input type="radio" name="searchType" th:text="글쓴이" th:onclick="|javascript:writer()|">
+
+				</div>
+				<div class="w300" style="padding-right:10px">
+					<input type="text" class="form-control form-control-sm" name="keyword" id="keyword">
+				</div>
+				<div>
+					<button type="submit" class="btn btn-sm btn-primary" name="btnSearch" th:text="검색">검색</button>&nbsp;&nbsp;
+				</div>
+			</div>
+			</form>
+			<!-- search{e} -->
+
 			<table class="table table-hover" id='board_list'>
 				<thead>
 					<tr>
@@ -39,7 +70,7 @@
 						<td><a href='board_read.html' th:href="@{/board/read/{boardId}/{memberId}(boardId=${board.id} , memberId=${board.memberId})}" th:text="${board.subject}">제목</a></td>
 						<td class="text-center d-none d-md-table-cell" th:text="${board.writer}">홍길동</td>
 						<th class="text-center d-none d-md-table-cell" th:text="${board.readCount}">추천수</th>
-						<th class="text-center d-none d-md-table-cell" th:text="${board.createdDate}">작성날짜</th>
+						<th class="text-center d-none d-md-table-cell" th:text="${#temporals.format(board.createdDate, 'yy-MM-dd HH:mm')}">작성날짜</th>
 					</tr>
 					</div>
 				</tbody>
@@ -59,7 +90,7 @@
 						</li>
 					</th:block>
 
-					<th:block th:each="pageNum:${#numbers.sequence(page.startPage,page.endPage)}">
+					<th:block th:if="${allBoard.size() > 0}" th:each="pageNum:${#numbers.sequence(page.startPage,page.endPage)}">
 						<li class="page-item">
 							<a th:href="@{/board(pageNum=${pageNum}-1)}" th:text="${pageNum}" class="page-link">1</a>
 						</li>

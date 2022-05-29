@@ -29,7 +29,6 @@
         </ul>
 
         <ul class="navbar-nav ml-auto" th:if="${session.loginMember != null}" >
-          <th:block th:if="${session.loginMember.grade != T(board.boardstudy.entity.MemberGrade).MASTER}">
                 <li>
                     <a href="myBoard.html" th:href="@{/board/myBoard}" class="nav-link">나의 게시글</a>
                 </li>
@@ -39,18 +38,6 @@
                 <li class="nav-item">
                      <a href="index.html" th:href="@{/login/logout}" class="nav-link">로그아웃</a>
                 </li>
-        </th:block>
-          <th:block th:if="${session.loginMember.grade == T(board.boardstudy.entity.MemberGrade).MASTER}">
-                <li class="nav-item">
-                    <a href="myBoard.html" th:href="@{/admin/board}" class="nav-link">게시글 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a href="updateForm.html" th:href="@{/admin/member}" class="nav-link">회원 관리</a>
-                </li>
-                <li class="nav-item">
-                    <a href="index.html" th:href="@{/login/logout}" class="nav-link">로그아웃</a>
-                </li>
-            </th:block>
         </ul>
     </div>
 </nav>

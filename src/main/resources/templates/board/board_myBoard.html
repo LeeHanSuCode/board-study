@@ -39,7 +39,7 @@
 						<td><a href='board_read.html' th:href="@{/board/read/{boardId}/{memberId}(boardId=${board.id} , memberId=${board.memberId})}" th:text="${board.subject}">제목</a></td>
 						<td class="text-center d-none d-md-table-cell" th:text="${board.writer}">홍길동</td>
 						<th class="text-center d-none d-md-table-cell" th:text="${board.readCount}">추천수</th>
-						<th class="text-center d-none d-md-table-cell" th:text="${board.createdDate}">작성날짜</th>
+						<th class="text-center d-none d-md-table-cell" th:text="${#temporals.format(board.createdDate, 'yy-MM-dd HH:mm')}">작성날짜</th>
 					</tr>
 					</div>
 				</tbody>
@@ -59,7 +59,8 @@
 						</li>
 					</th:block>
 
-					<th:block th:each="pageNum:${#numbers.sequence(page.startPage,page.endPage)}">
+
+					<th:block th:if="${allMyBoard.size() > 0}" th:each="pageNum:${#numbers.sequence(page.startPage,page.endPage)}">
 						<li class="page-item">
 							<a th:href="@{/board/myBoard(pageNum=${pageNum}-1)}" th:text="${pageNum}" class="page-link">1</a>
 						</li>

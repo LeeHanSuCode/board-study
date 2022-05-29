@@ -12,11 +12,11 @@ import java.util.List;
 @Getter @Setter
 public class BoardUpdateDTO {
 
-    public BoardUpdateDTO(Long id ,String writer,String subject , String content){
+    public BoardUpdateDTO(Long id ,String writer,String subject , String boardContent){
         this.writer =writer;
         this.id = id;
         this.subject =subject;
-        this.content = content;
+        this.boardContent = boardContent;
     }
 
     private String writer;
@@ -25,7 +25,7 @@ public class BoardUpdateDTO {
     @NotBlank
     private String subject;
     @NotBlank
-    private String content;
+    private String boardContent;
 
     private List<MultipartFile> files;
 

@@ -10,6 +10,14 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 public class LoginDTO {
 
+    public LoginDTO(){};
+
+    public LoginDTO(Long id , String userId , String username){
+        this.id = id;
+        this.userId = userId;
+        this.username = username;
+    }
+
 
     private Long id;
 
@@ -24,9 +32,6 @@ public class LoginDTO {
     private String password2;
 
     private String writer;
-
-    private MemberGrade grade;
-
 
 
 }
