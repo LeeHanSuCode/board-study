@@ -7,12 +7,10 @@ import board.boardstudy.dto.board.BoardReadDTO;
 import board.boardstudy.dto.board.BoardUpdateDTO;
 import board.boardstudy.dto.board.BoardWriteDTO;
 import board.boardstudy.dto.paging.Pagination;
-import board.boardstudy.entity.Board;
 import board.boardstudy.service.BoardService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,9 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Controller
 @RequestMapping("/board")
 @RequiredArgsConstructor
@@ -37,8 +32,6 @@ public class BoardController {
 
 
 
-    @Value("${file.dir}")
-    private String fileDir;
 
 
     //게시판 메인(전체 글 목록)
@@ -94,7 +87,7 @@ public class BoardController {
 
 
 
-    //글쓰기 페이지
+    //글쓰기 페이지로 이동.
     @GetMapping("/write")
     public String boardWriteForm(Model model){
         model.addAttribute("boardWriteDTO" , new BoardWriteDTO());
@@ -105,8 +98,9 @@ public class BoardController {
     //글쓰기 등록.
     @PostMapping("/write")
     public String boardWriteProcess(@Validated @ModelAttribute BoardWriteDTO boardWriteDTO
-            , BindingResult bs , @Login LoginDTO loginDTO,
-                                    RedirectAttributes redirectAttributes){
+            , BindingResult bs
+            , @Login LoginDTO loginDTO
+            ,RedirectAttributes redirectAttributes){
 
         if(bs.hasErrors()){
             return "/board/board_write";
@@ -137,6 +131,7 @@ public class BoardController {
     @PostMapping("/update/{boardId}")
     public String updatePro(@Validated BoardUpdateDTO boardUpdateDTO,BindingResult bs , @PathVariable Long boardId ,
                          @Login LoginDTO loginDTO, RedirectAttributes redirectAttributes){
+        //Bean Validation 체크
         if(bs.hasErrors()){
             return "/board/board_modify";
         }
@@ -153,29 +148,12 @@ public class BoardController {
 
     //글 삭제
     @GetMapping("/remove/{boardId}")
-    public String removeBoard(@PathVariable Long boardId , RedirectAttributes redirectAttributes){
+    public String removeBoard(@PathVariable Long boardId){
         boardService.delete(boardId);
 
         return "redirect:/board";
     }
 
 
-
-    //Board -> BoardUpdateDTO
-    private BoardUpdateDTO changeToBoardUpdateDTO(Board board){
-        return new BoardUpdateDTO(board.getId(),board.getWriter(),board.getSubject(),board.getBoardContent());
-    }
-
-
-    
-    //FileStore -> FileDTO
-    private List<FileDTO> isFileStore(Board board){
-        List<FileDTO> files = new ArrayList<>();
-
-        if(board.getFileStores().size()!=0) {
-            board.getFileStores().stream().forEach(f -> files.add(new FileDTO(f.getId(),f.getUploadFilename(),f.getServerFilename())));
-        }
-        return files;
-    }
 
 }

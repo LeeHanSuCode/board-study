@@ -1,6 +1,5 @@
 package board.boardstudy.controller.file;
 
-import board.boardstudy.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 public class FileController {
 
     private final FileProcess fileProcess;
-    private final FileService fileService;
 
 
 

@@ -29,7 +29,7 @@
 			}
 
 			$.ajax({
-				url: '/comment/register/' +boardId ,
+				url: '/comment/' +boardId ,
 				data: {
 					comment: content
 				},
@@ -59,7 +59,7 @@
 
 			$.ajax({
 				type:'GET',
-				url : "/comment/list/" + boardId,
+				url : "/comment/" + boardId,
 				dataType : "json",
 				success : function(data){
 					var html = "";
@@ -117,14 +117,14 @@
 
 		}
 
-		//수정 처리
+		//댓글 수정 처리
 		function updateCommentPro(commentId){
 
 				let content = document.getElementById(commentId).value;
 
 				$.ajax({
-					type: 'POST',
-					url: "/comment/update/" + commentId,
+					type: 'patch',
+					url: "/comment/" + commentId,
 					data: {
 						content: content
 					},
@@ -137,13 +137,13 @@
 
 		}
 
-		//삭제
+		//댓글 삭제
 		function removeComment(commentId){
 			let content = document.getElementById(commentId).value;
 
 			$.ajax({
-				type:'POST',
-				url : "/comment/delete/" + commentId,
+				type:'delete',
+				url : "/comment/" + commentId,
 				success:function (){
 					alert('삭제되었습니다.')
 					getCommentList()

@@ -50,13 +50,15 @@ public class BoardService {
     //게시글 등록
     @Transactional
     public Long register(BoardWriteDTO boardWriteDTO, Long memberId) {
-        
-        Board board = changeToBoard(boardWriteDTO, memberService.findById(memberId));
+
+        //dto -> entity
+        Board board = boardWriteDTO.changeToBoard(memberService.findById(memberId));
 
         Long boardId = boardRepository.save(board).getId();
 
+        //파일 유뮤 -> 있으면 등록.
         if (!boardWriteDTO.getFiles().isEmpty()) {
-            ioFileSave(boardWriteDTO.getFiles(), board);            //파일 유뮤 -> 있으면 등록.
+            ioFileSave(boardWriteDTO.getFiles(), board);
         }
 
         return boardId;
@@ -150,7 +152,7 @@ public class BoardService {
 
 
     //전부 삭제해야 하는 경우.
-    //살아남은 파일이 있는 경우
+    //살아남은 파일 x , 기존 게시글에는 파일 존재하는 경우.
     private void existFileRemove(BoardUpdateDTO boardUpdateDTO, Board findBoard){
         if(boardUpdateDTO.getAliveFiles().size() == 0 && findBoard.getFileStores().size() > 0) {
           
@@ -163,13 +165,17 @@ public class BoardService {
 
 
     //파일 수정
+    //살아남은 파일 o , 기존의 파일과 살아남은 파일의 갯수가 같지않을 경우
+    //비교하여 기존 파일에서 살아남지 못한 파일 삭제.
     private void removeFileByUpdate(BoardUpdateDTO boardUpdateDTO , Board findBoard){
         if(boardUpdateDTO.getAliveFiles().size() > 0 && findBoard.getFileStores().size() != boardUpdateDTO.getAliveFiles().size()){
 
+            //기존 파일 목록 -> Long(id값만 추출)
             List<Long> exist = findBoard.getFileStores().stream()
                     .map(f -> f.getId().longValue())
                     .collect(Collectors.toList());
 
+            //살아남은 파일 , 기존의 파일 비교.
             List<Long> longs = compareFile(exist, boardUpdateDTO.getAliveFiles());
 
             for(Long x : longs) {
@@ -181,14 +187,19 @@ public class BoardService {
     }
 
 
-    //파일 삭제 목록만 찾아 아이디 값만 반환.
+    //살아남은 파일과 기존의 파일 비교.
+    //일치하지 않는 파일 ID 목록 반환(제거되어야 할 파일)
     private List<Long> compareFile(List<Long> exist , List<Long> remove){
         return exist.stream().filter(f -> remove.stream().noneMatch(Predicate.isEqual(f)))
                 .collect(Collectors.toList());
     }
 
 
-    //파일 저장
+
+    /*파일 저장
+    - MultipartFile -> FileStore
+    - 파일 저장.
+    */
     private void ioFileSave(List<MultipartFile> multipartFiles, Board board) {
         try {
             for(FileStore f : fileProcess.storeFiles(multipartFiles)) {
@@ -206,6 +217,7 @@ public class BoardService {
 
 
     //삭제
+    //게시글에 있는 댓글과 파일 같이 삭제.
     @Transactional
     public void delete(Long boardId) {
         Board board = boardRepository.findById(boardId)
@@ -218,30 +230,22 @@ public class BoardService {
 
 
 
-    //연관관계 엔티티 삭제
+    //게시글 연관관계 엔티티 삭제(파일 ,댓글)
     private void deletedByBoard(Board board){
         //파일 유무
         if(board.getFileStores().size() > 0){
-            for(FileStore f : board.getFileStores()){
-                fileStoreRepository.delete(f);
-            }
+           fileStoreRepository.deletedByBoard(board);
         }
 
         //댓글 유무
         if(board.getComments().size() > 0){
-            for(Comments c : board.getComments()){
-                commentRepository.delete(c);
-            }
+            commentRepository.deletedByBoard(board);
         }
     }
 
 
 
-    //BoardWriteDTO -> Board
-    private Board changeToBoard(BoardWriteDTO boardWriteDTO, Member member) {
-        return new Board(boardWriteDTO.getSubject(),
-                member.getUsername(), boardWriteDTO.getBoardContent(), member);
-    }
+
 
 
 

@@ -28,7 +28,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/comment")
 @RequiredArgsConstructor
-@Slf4j
+@RestController
 public class CommentController {
 
     private final CommentService commentService;
@@ -36,16 +36,15 @@ public class CommentController {
     private final BoardService boardService;
 
        //등록
-      @PostMapping("/register/{boardId}")
-      @ResponseBody
+      @PostMapping("/{boardId}")
       public String writeComment(@PathVariable Long boardId, @RequestParam String comment,
-                                 @Login LoginDTO loginDTO){
+                                 @Login LoginDTO loginDTO) {
 
           Member findMember = memberService.findById(loginDTO.getId());
 
           Board findBoard = boardService.findOne(boardId);
 
-          if(commentService.registry(new Comments(comment, findMember.getUserId(), findBoard, findMember)) == null){
+          if (commentService.registry(new Comments(comment, findMember.getUserId(), findBoard, findMember)) == null) {
               return "false";
           }
 
@@ -54,36 +53,23 @@ public class CommentController {
 
 
       //댓글 조회
-      @GetMapping("/list/{boardId}")
-      @ResponseBody
+      @GetMapping("/{boardId}")
       public List<CommentReadDTO> commentList(@PathVariable Long boardId){
           return changeToCommentReadDTO_List(commentService.allComment(boardId));
       }
 
 
-      //댓글 단건 조회
-    @GetMapping("/findById/{commentId}")
-    @ResponseBody
-    public CommentReadDTO findComment(@PathVariable Long commentId){
-        Comments findComment = commentService.findById(commentId);
-
-       return new CommentReadDTO(findComment.getId(), findComment.getMember().getId(), findComment.getWriter()
-                            , findComment.getCommentContent(), findComment.getCreatedDate());
-    }
-
 
       //댓글 수정
-    @PostMapping("/update/{commentId}")
-    @ResponseBody
+    @PatchMapping("/{commentId}")
     public String updateComment(@PathVariable Long commentId ,@RequestParam String content){
           commentService.updateComment(content,commentId);
           return "true";
     }
 
 
-      //댓글 삭제
-    @PostMapping("/delete/{commentId}")
-    @ResponseBody
+    //댓글 삭제
+    @DeleteMapping("/{commentId}")
     public String deleteComment(@PathVariable Long commentId){
           commentService.removeComment(commentId);
         return "true";

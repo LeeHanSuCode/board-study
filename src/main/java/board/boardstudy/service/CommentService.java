@@ -35,13 +35,6 @@ public class CommentService {
     }
 
 
-
-    //단건 조회(댓글 수정때  필요)
-    public Comments findById(Long id){
-        return commentRepository.findById(id)
-                .orElseThrow(()-> new CommentsException("존재하지 않는 댓글 입니다."));
-    }
-
     //수정
     @Transactional
     public void updateComment(String content , Long id){

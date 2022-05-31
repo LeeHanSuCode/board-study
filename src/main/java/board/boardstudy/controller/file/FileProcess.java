@@ -1,6 +1,5 @@
 package board.boardstudy.controller.file;
 
-import board.boardstudy.entity.Board;
 import board.boardstudy.entity.FileStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,8 @@ public class FileProcess {
         return fileDir + filename;
     }
 
-    //여러개의 파일저장
+    //여러 파일 저장할 경우
+    //storeFile(단건파일)을 파일 갯수만큼 반복 호출.
     public List<FileStore> storeFiles(List<MultipartFile> multipartFiles) throws IOException{
         List<FileStore> storeFileResult = new ArrayList<>();
 
@@ -36,6 +36,7 @@ public class FileProcess {
     }
 
     //한개의 파일만 저장할 경우.
+    //서버에 파일을 저장.
     public FileStore storeFile(MultipartFile multipartFile) throws IOException {
         if(multipartFile.isEmpty()){
             return null;
@@ -56,6 +57,7 @@ public class FileProcess {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
     }
+
 
     //서버에 저장할 파일명 생성.
     private String createStoreFileName(String originalFilename){
