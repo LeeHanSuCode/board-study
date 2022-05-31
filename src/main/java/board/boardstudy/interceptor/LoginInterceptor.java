@@ -21,7 +21,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         if(session==null || session.getAttribute("loginMember")==null){
 
                 log.info("비로그인 사용자 입니다.");
+
+                //비로그인 사용자의 경우 , 로그인 화면으로 이동.
                 response.sendRedirect("/login?requestURI=" + requestURI);
+
                 return false;
         }
         return true;

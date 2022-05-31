@@ -150,10 +150,12 @@ public class BoardService {
 
 
     //전부 삭제해야 하는 경우.
+    //살아남은 파일이 있는 경우
     private void existFileRemove(BoardUpdateDTO boardUpdateDTO, Board findBoard){
-        if(boardUpdateDTO.getRemoveFiles().size() == 0 && findBoard.getFileStores().size() > 0) {
-
+        if(boardUpdateDTO.getAliveFiles().size() == 0 && findBoard.getFileStores().size() > 0) {
+          
             for (FileStore f : findBoard.getFileStores()) {
+
                 fileStoreRepository.delete(f);
             }
         }
@@ -162,13 +164,13 @@ public class BoardService {
 
     //파일 수정
     private void removeFileByUpdate(BoardUpdateDTO boardUpdateDTO , Board findBoard){
-        if(boardUpdateDTO.getRemoveFiles().size() > 0 && findBoard.getFileStores().size() != boardUpdateDTO.getRemoveFiles().size()){
+        if(boardUpdateDTO.getAliveFiles().size() > 0 && findBoard.getFileStores().size() != boardUpdateDTO.getAliveFiles().size()){
 
             List<Long> exist = findBoard.getFileStores().stream()
                     .map(f -> f.getId().longValue())
                     .collect(Collectors.toList());
 
-            List<Long> longs = compareFile(exist, boardUpdateDTO.getRemoveFiles());
+            List<Long> longs = compareFile(exist, boardUpdateDTO.getAliveFiles());
 
             for(Long x : longs) {
                 fileStoreRepository.delete(
@@ -179,7 +181,7 @@ public class BoardService {
     }
 
 
-    //파일 삭제 목록만 찾기
+    //파일 삭제 목록만 찾아 아이디 값만 반환.
     private List<Long> compareFile(List<Long> exist , List<Long> remove){
         return exist.stream().filter(f -> remove.stream().noneMatch(Predicate.isEqual(f)))
                 .collect(Collectors.toList());

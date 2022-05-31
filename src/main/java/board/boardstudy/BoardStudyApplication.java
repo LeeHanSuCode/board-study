@@ -18,6 +18,8 @@ public class BoardStudyApplication {
 	@PersistenceContext
 	private EntityManager em;
 
+
+	//queryDSL
 	@Bean
 	public JPAQueryFactory jpaQueryFactory(){
 		return new JPAQueryFactory(em);

@@ -1,6 +1,7 @@
 package board.boardstudy.service.certification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,16 +15,16 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService{
 
     private final JavaMailSender javaMailSender;
 
 
-
     public String mail(String email ,String num){
 
         String from ="dlsdn857758@gmail.com";      //보내는 메일
-        String to = email;
+        String to = email;                         //받는 메일
         String title = "studyBoard 인증번호 입니다.";
         String content="[인증번호]" + num + "입니다 <br /> 인증번호 확인란에 기입해주세요.";
 

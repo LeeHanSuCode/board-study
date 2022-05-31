@@ -105,7 +105,8 @@ public class BoardController {
     //글쓰기 등록.
     @PostMapping("/write")
     public String boardWriteProcess(@Validated @ModelAttribute BoardWriteDTO boardWriteDTO
-            , BindingResult bs , @Login LoginDTO loginDTO, RedirectAttributes redirectAttributes){
+            , BindingResult bs , @Login LoginDTO loginDTO,
+                                    RedirectAttributes redirectAttributes){
 
         if(bs.hasErrors()){
             return "/board/board_write";

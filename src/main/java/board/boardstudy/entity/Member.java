@@ -57,8 +57,18 @@ public class Member extends BaseEntity {
     private String knownRoot;
 
 
+
+    //게시글 연관관계 설정
     @OneToMany(mappedBy = "member")
     private List<Board> boardList = new ArrayList<>();
+
+
+
+    //댓글 연관관계 설정
+    @OneToMany(mappedBy = "member")
+    private List<Comments> commentsList = new ArrayList<>();
+
+
 
 
     //비밀번호 변경
@@ -68,8 +78,9 @@ public class Member extends BaseEntity {
     }
 
 
+
     //회원 정보 수정
-    public void changeMemberInfo(String password , String email , String tel){
+    public void updateEntity(String password , String email , String tel){
         this.email = email;
         this.tel = tel;
         this.password = password;

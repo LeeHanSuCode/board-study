@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
+
+    //파라미터가 Login 어노테이션을 가지고 있는지
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         boolean isHasLogin = parameter.hasParameterAnnotation(Login.class);

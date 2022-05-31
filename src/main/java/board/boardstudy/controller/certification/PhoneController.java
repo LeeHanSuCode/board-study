@@ -30,7 +30,8 @@ public class PhoneController {
     @PostMapping("/phone/{tel}")
     @ResponseBody
     public String phoneCertification(@PathVariable String tel){
-        //검증
+
+        //전화번호 형식 검증
         if(!matcherTel(tel)){
             return "error";
         }
@@ -44,11 +45,12 @@ public class PhoneController {
     @PostMapping("/findId/{tel}/{username}")
     @ResponseBody
     public String findIdPhone(@PathVariable String tel , @PathVariable String username){
-        //검증
+        //전화번호 형식 검증
         if(!matcherTel(tel)){
             return "error";
         }
 
+        //전화번호로 회원 조회
         if(!username.equals( memberService.findByTel(tel).getUsername())){
             return "error_username";
         }
@@ -58,7 +60,9 @@ public class PhoneController {
 
 
 
-    //아이디 찾기인증번호 확인 -> 아이디 반환.
+    /*클라이언트 측에서 인증번호가 일치할 경우 호출
+    전화번호 회원 조회 -> 회원 아이디 반환.
+   * */
     @PostMapping("/findId/{tel}")
     @ResponseBody
     public String findIdPhonePro(@PathVariable String tel){
@@ -72,11 +76,12 @@ public class PhoneController {
     @PostMapping("/findPw/{tel}/{username}/{userId}")
     @ResponseBody
     public String findIdPhone(@PathVariable String tel , @PathVariable String username , @PathVariable String userId){
-        //검증
+        //전화번호 형식 검증
         if(!matcherTel(tel)){
             return "error";
         }
 
+        //회원 조회
         FindDTO findMember = memberService.findByTel(tel);
 
         if(!username.equals(findMember.getUsername()) || !userId.equals(findMember.getUserId())){
@@ -101,10 +106,13 @@ public class PhoneController {
     //비밀번호 변경 로직
     @PostMapping("/changePw")
     public String changePwPro(@Validated LoginDTO loginDTO , BindingResult bs){
+
+        //넘어온 데이터 공백시 return
         if(bs.hasErrors()){
             return "/login/find/pw/changePw_Form";
         }
-        //NotEqualsPw
+
+        //비밀번호&비밀번호확인 일치 여부
         if(!loginDTO.getPassword().equals(loginDTO.getPassword2())){
             bs.rejectValue("password","NotEqualsPw");
             return "/login/find/pw/changePw_Form";

@@ -25,8 +25,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-
-    //회원가입화면
+    //회원 가입 화면으로 이동.
     @GetMapping("/join")
     public String joinForm(Model model){
         model.addAttribute("memberJoinDTO" , new MemberJoinDTO());
@@ -34,10 +33,11 @@ public class MemberController {
     }
 
 
-    //회원가입
+    //회원 가입 처리
     @PostMapping("/join")
     public String join(@Validated @ModelAttribute MemberJoinDTO memberJoinDTO, BindingResult bs){
 
+        //DTO에 값이 주입될 때 발생된 문제가 있을 경우 return.
         if(bs.hasErrors()){
             return "/members/joinForm";
         }
@@ -45,14 +45,24 @@ public class MemberController {
         //비밀번호,비밀번호 확인 일치 여부.
         isEqualsPw(memberJoinDTO.getPassword(),memberJoinDTO.getPassword2(),bs);
 
+        //비밀번호가 일치하지 않았을 경우 return
+        //동시에 휴대폰 인증을 다시 하게끔 false로 변경.
         if(bs.hasErrors()){
             memberJoinDTO.setCheckPhone(false);
             return "/members/joinForm";
         }
 
-        memberService.join(memberJoinDTO.changeToMemberEntity(memberJoinDTO));
+        //dto -> entity로 변경 후 저장.
+        memberService.join(memberJoinDTO.changeToMember());
 
         return "redirect:/";
+    }
+
+    //비밀번호 확인 일치 여부
+    private void isEqualsPw(String password , String password2 , BindingResult bs){
+        if(!password.equals(password2)) {
+            bs.rejectValue("password", "NotEquals", "비밀번호가 일치하지 않습니다.");
+        }
     }
 
 
@@ -63,6 +73,7 @@ public class MemberController {
 
         Member findMember = memberService.findById(loginDTO.getId());
 
+        //회원 조회시 보여줄 데이터만 추출하여 DTO로 변환.
         model.addAttribute("memberInfoDTO" ,new MemberUpdateDTO(findMember.getUsername(),
                 findMember.getTel() ,findMember.getEmail()));
 
@@ -71,7 +82,7 @@ public class MemberController {
 
 
 
-    //회원 수정
+    //회원 수정 페이지로 이동.
     @GetMapping("/update")
     public String updateForm(@Login LoginDTO loginDTO , Model model){
         Member findMember = memberService.findById(loginDTO.getId());
@@ -84,34 +95,32 @@ public class MemberController {
 
 
 
-    //회원 수정
+    //회원 수정 처리
     @PostMapping("/update")
     public String update(@Validated @ModelAttribute MemberUpdateDTO memberUpdateDTO , BindingResult bs ,
                          @Login LoginDTO loginDTO){
 
+        //DTO에 값이 주입될 때 발생된 문제가 있을 경우 return.
         if(bs.hasErrors()){
             return "/members/updateForm";
         }
+
         //비밀번호,비밀번호 확인 일치 여부.
         isEqualsPw(memberUpdateDTO.getPassword(),memberUpdateDTO.getPassword2(),bs);
 
+        //비밀번호가 일치하지 않았을 경우 return
         if(bs.hasErrors()){
             return "/members/updateForm";
         }
+
         memberService.updateMember(loginDTO.getId() , memberUpdateDTO);
 
         return "redirect:/members/info";
     }
 
 
-    //비밀번호 확인 일치 여부
-    private void isEqualsPw(String password , String password2 , BindingResult bs){
-        if(!password.equals(password2)) {
-            bs.rejectValue("password", "NotEquals", "비밀번호가 일치하지 않습니다.");
-        }
-    }
 
-
+    //회원 가입시
     //아이디 중복확인 요청처리
     @GetMapping("/checkUserId/{userId}")
     @ResponseBody

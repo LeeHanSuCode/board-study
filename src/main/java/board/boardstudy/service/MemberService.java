@@ -25,14 +25,12 @@ public class MemberService {
     
     private final MemberRepository memberRepository;
     private final FileStoreRepository fileStoreRepository;
-    private final CommentsRepository commentRepository;
     private final BoardRepository boardRepository;
+    private final CommentsRepository commentsRepository;
     
-    
-    //가입
+    //회원 가입
     @Transactional
     public Long join(Member member){
-        
         memberRepository.save(member);
         return member.getId();
     }
@@ -57,24 +55,24 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원 입니다."));
     }
 
-    //로그인시 유저 아이디로 조회
+    /*로그인시 유저 아이디로 조회
+      로그인시 회원이 없는 경우 properties에 등록된 메세지로 처리해주기 위한 용도.*/
     public Optional<Member> loginFindUserId(String userId){
         return memberRepository.findByUserId(userId);
     }
 
 
-    //전화번호로 조회
+    //전화번호로 조회(아이디 & 비밀번호 찾기 용도)
     public FindDTO findByTel(String tel){
         return  memberRepository.findByTel(tel)
                 .orElseGet(FindDTO::new);
     }
 
-    //이메일로 조회
+    //이메일로 조회(아이디 & 비밀번호 찾기 용도)
     public FindDTO findByEmail(String email){
         return memberRepository.findByEmail(email)
                 .orElseGet(FindDTO::new);
     }
-
 
 
     //증복 회원 체크
@@ -85,7 +83,11 @@ public class MemberService {
         return "false";
     }
 
-    //비밀번호 변경
+
+    /*
+    비밀번호 변경
+    비밀번호 찾기에서 인증된 회원이 비밀번호 변경할 때 사용.
+    */
     @Transactional
     public String changePw(LoginDTO loginDTO){
         Member findMember = memberRepository.findByUserId(loginDTO.getUserId())
@@ -97,45 +99,60 @@ public class MemberService {
     }
 
 
-    //수정
+    //수정 처리
     @Transactional
     public Long updateMember(Long id , MemberUpdateDTO updateMemberDTO){
         Member findMember = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원 입니다."));
 
-        findMember.changeMemberInfo(updateMemberDTO.getPassword(), updateMemberDTO.getEmail(), updateMemberDTO.getTel());
+        findMember.updateEntity(updateMemberDTO.getPassword(), updateMemberDTO.getEmail(), updateMemberDTO.getTel());
 
         return findMember.getId();
     }
 
-    //삭제
+    /*
+    * 삭제 작업
+    * 게시글 같이 삭제.
+    * 게시글에 작성된 댓글 및 파일 같이 삭제
+    * 회원이 작성한 댓글 또한 같이 삭제.
+    * */
     @Transactional
     public void removeMember(Long id){
-        Member member = memberRepository.findById(id)
+        Member member = memberRepository.findByFetchId(id)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원 입니다."));
 
+        //회원이 작성항 게시글의 파일과 ,
+        //그 게시글에 작성한 다른 유저들의 댓글 삭제.
         for(Board b :  member.getBoardList()){
-            deletedByMember(b);
+            deletedByBoard(b);
             boardRepository.delete(b);
         }
+
+        //회원이 작성한 댓글 삭제
+        deletedByMember(member);
 
         memberRepository.delete(member);
     }
 
-    //게시글삭제시 -> 댓글,파일 같이 삭제.
-    private void deletedByMember(Board board){
-
+    //삭제되는 게시글과 연관된 파일과 댓글 삭제
+    private void deletedByBoard(Board board){
+        //게시글 삭제
         if(board.getFileStores().size()>0){
-            for(FileStore f : board.getFileStores()){
-                fileStoreRepository.delete(f);
-            }
+            fileStoreRepository.deletedByBoard(board);
         }
+
+        //댓글 삭제
         if(board.getComments().size() > 0){
-            for(Comments c : board.getComments()){
-                commentRepository.delete(c);
-            }
+            commentsRepository.deletedByBoard(board);
         }
     }
-    
-    
+
+
+    //삭제되는 회원과 연관된 댓글 삭제
+    private void deletedByMember(Member member){
+        if(member.getCommentsList().size() > 0){
+            commentsRepository.deletedByMember(member);
+        }
+    }
+
 }

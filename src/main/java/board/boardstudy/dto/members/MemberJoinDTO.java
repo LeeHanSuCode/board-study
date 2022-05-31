@@ -43,18 +43,18 @@ public class MemberJoinDTO {
 
 
     //MemberJoinDTO -> Member
-    public Member changeToMemberEntity(MemberJoinDTO joinMemberDTO){
+    public Member changeToMember(){
 
         String temp;
 
-        if(joinMemberDTO.getKnownRoot() == null){
+        if(this.getKnownRoot() == null){
             temp = "선택 안함";
         }else{
-            temp = joinMemberDTO.getKnownRoot();
+            temp = this.getKnownRoot();
         }
 
-        return new Member(joinMemberDTO.getUsername() , joinMemberDTO.getUserId()
-                , joinMemberDTO.getPassword() , joinMemberDTO.getEmail() , joinMemberDTO.getTel() ,temp);
+        return new Member(this.getUsername() , this.getUserId()
+                , this.getPassword() , this.getEmail() , this.getTel() ,temp);
     }
 
 

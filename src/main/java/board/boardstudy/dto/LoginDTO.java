@@ -1,6 +1,5 @@
 package board.boardstudy.dto;
 
-import board.boardstudy.entity.MemberGrade;
 import lombok.Getter;
 import lombok.Setter;
 
