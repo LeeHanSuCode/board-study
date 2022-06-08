@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,9 +38,9 @@ public class BoardController {
 
     //게시판 메인(전체 글 목록)
     @GetMapping
-    public String boardHome(@RequestParam(defaultValue = "0") int pageNum , Model model){
+    public String boardHome(@PageableDefault(size = 10 , page = 0 , sort = "id",direction = Sort.Direction.DESC) Pageable pageable, Model model){
 
-        Page<BoardReadDTO> boardList = boardService.findAll(PageRequest.of(pageNum, 10, Sort.by("id").descending()));
+        Page<BoardReadDTO> boardList = boardService.findAll(pageable);
 
         model.addAttribute("allBoard" ,boardList.getContent());
         model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));
@@ -48,11 +50,11 @@ public class BoardController {
 
     //게시글 목록(조건)
     @GetMapping("/condition")
-    public String boardCondition(@RequestParam(defaultValue = "0") int pageNum,
+    public String boardCondition(@PageableDefault(size = 10 , page = 0 , sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
                                  BoardSearchCondition boardSearchCondition,
                                  Model model){
 
-        Page<BoardReadDTO> boardList = boardService.findCondition(boardSearchCondition,PageRequest.of(pageNum, 10, Sort.by("id").descending()));
+        Page<BoardReadDTO> boardList = boardService.findCondition(boardSearchCondition,pageable);
 
         model.addAttribute("allBoard" ,boardList.getContent());
         model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));
@@ -64,9 +66,9 @@ public class BoardController {
 
     //내가 작성한 게시글 목록 보기
     @GetMapping("/myBoard")
-    public String myBoard(@Login LoginDTO loginDTO , Model model, @RequestParam(defaultValue = "0") int pageNum){
+    public String myBoard(@Login LoginDTO loginDTO , Model model, @PageableDefault(size = 10 , page = 0 , sort = "id",direction = Sort.Direction.DESC) Pageable pageable){
 
-        Page<BoardReadDTO> boardList = boardService.findAllMyBoard(loginDTO.getId(), PageRequest.of(pageNum, 10, Sort.by("id").descending()));
+        Page<BoardReadDTO> boardList = boardService.findAllMyBoard(loginDTO.getId(),pageable);
 
         model.addAttribute("allMyBoard", boardList.getContent());
         model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));

@@ -40,19 +40,18 @@ public class BoardService {
 
     
     private final BoardRepository boardRepository;
-    private final MemberService memberService;
     private final FileStoreRepository fileStoreRepository;
     private final FileProcess fileProcess;
     private final CommentsRepository commentRepository;
-
+    private final MemberRepository memberRepository;
 
 
     //게시글 등록
     @Transactional
     public Long register(BoardWriteDTO boardWriteDTO, Long memberId) {
-
+        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberException("회원이 존재하지 않습니다."));
         //dto -> entity
-        Board board = boardWriteDTO.changeToBoard(memberService.findById(memberId));
+        Board board = boardWriteDTO.changeToBoard(findMember);
 
         Long boardId = boardRepository.save(board).getId();
 
@@ -75,9 +74,9 @@ public class BoardService {
 
     //나만의 게시글 조회
     public Page<BoardReadDTO> findAllMyBoard(Long memberId , Pageable pageable) {
-        Member member = memberService.findById(memberId);
+        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberException("회원이 존재하지 않습니다."));
 
-        return boardRepository.findMyBoardAll(member,pageable).map(b -> new BoardReadDTO(b.getId(),b.getMember().getId(),b.getSubject(),b.getBoardContent(),
+        return boardRepository.findMyBoardAll(findMember,pageable).map(b -> new BoardReadDTO(b.getId(),b.getMember().getId(),b.getSubject(),b.getBoardContent(),
                 b.getWriter(),b.getCreatedDate(),b.getReadCount()));
     }
 

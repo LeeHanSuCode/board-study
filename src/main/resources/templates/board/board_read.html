@@ -189,7 +189,7 @@
 					</div>
 					<div class="form-group">
 						<div th:if="${boardReadDTO.fileDTO.size() > 0}">
-								<div th:each="file : ${boardReadDTO.fileDTO}">첨부파일 : <a th:href="|/board/download/${file.uploadFilename}/${file.serverFilename}|"
+								<div th:each="file : ${boardReadDTO.fileDTO}">첨부파일 : <a th:href="|/file/download/${file.uploadFilename}/${file.serverFilename}|"
 								th:text="${file.uploadFilename}"></a> </div>
 						</div>
 

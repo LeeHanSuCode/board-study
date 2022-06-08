@@ -15,7 +15,7 @@ public interface FileStoreRepository extends JpaRepository<FileStore,Long> {
     @Query("select f from FileStore f where f.board=:board")
     public List<FileStore> findAllFile(@Param("board") Board board);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("delete from FileStore f where f.board = :board")
     public int deletedByBoard(@Param("board") Board board);
 

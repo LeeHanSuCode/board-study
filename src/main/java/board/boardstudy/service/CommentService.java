@@ -3,7 +3,9 @@ package board.boardstudy.service;
 
 import board.boardstudy.entity.Board;
 import board.boardstudy.entity.Comments;
+import board.boardstudy.exception.BoardException;
 import board.boardstudy.exception.CommentsException;
+import board.boardstudy.repository.BoardRepository;
 import board.boardstudy.repository.CommentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentsRepository commentRepository;
-    private final BoardService boardService;
+    private final BoardRepository boardRepository;
 
     //등록
     @Transactional
@@ -30,7 +32,7 @@ public class CommentService {
 
     //전체 조회
     public List<Comments> allComment(Long boardId){
-        Board findBoard = boardService.findOne(boardId);
+        Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new BoardException("게시글이 존재하지 않습니다."));
         return commentRepository.findByBoardId(findBoard);
     }
 

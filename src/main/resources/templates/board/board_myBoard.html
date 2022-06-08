@@ -50,7 +50,7 @@
 				<ul class="pagination justify-content-center">
 					<th:block th:if="${page.isExistPrevPage()}">
 						<li class="page-item">
-							<a th:href="@{/board/myBoard(pageNum=${page.startPage-11})}" class="page-link">이전</a>
+							<a th:href="@{/board/myBoard(page=${page.startPage-11})}" class="page-link">이전</a>
 						</li>
 					</th:block>
 					<th:block th:unless="${page.isExistPrevPage()}">
@@ -62,12 +62,12 @@
 
 					<th:block th:if="${allMyBoard.size() > 0}" th:each="pageNum:${#numbers.sequence(page.startPage,page.endPage)}">
 						<li class="page-item">
-							<a th:href="@{/board/myBoard(pageNum=${pageNum}-1)}" th:text="${pageNum}" class="page-link">1</a>
+							<a th:href="@{/board/myBoard(page=${pageNum}-1)}" th:text="${pageNum}" class="page-link">1</a>
 						</li>
 					</th:block>
 					<th:block th:if="${page.isExistNextPage()}">
 						<li class="page-item">
-							<a th:href="@{/board/myBoard(pageNum=${page.startPage+9})}" class="page-link">다음</a>
+							<a th:href="@{/board/myBoard(page=${page.startPage+9})}" class="page-link">다음</a>
 						</li>
 					</th:block>
 					<th:block th:unless="${page.isExistNextPage()}">
