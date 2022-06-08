@@ -44,7 +44,7 @@ public class BoardController {
 
         model.addAttribute("allBoard" ,boardList.getContent());
         model.addAttribute("page",new Pagination(boardList.getNumber()+1, boardList.getTotalPages(), boardList.getTotalElements(), 10));
-
+        System.out.println("변경되ㅣㄱㄹ");
         return "/board/board_main";
     }
 
